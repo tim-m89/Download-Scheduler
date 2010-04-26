@@ -1,0 +1,10 @@
+<!ENTITY DownloadScheduler "Télécharger ordonnanceur">
+<!ENTITY ScheduleLinkAs "Horaire du lien sous… ">
+<!ENTITY DownloadSchedulerOptions "Télécharger le Planificateur Options">
+<!ENTITY Cancelselected "Annuler le style sélectionné">
+<!ENTITY StartTime "Heure de début:">
+<!ENTITY PauseTime "Temps de pause:">
+<!ENTITY ConfirmClose "Confirmer le fermer">
+<!ENTITY CloseMsg1 "Vous avez planifié téléchargements. Etes-vous sûr de vouloir quitter la session actuelle de Firefox?">
+<!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les téléchargements prévue sera annulée.">
+

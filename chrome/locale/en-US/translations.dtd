@@ -1,0 +1,10 @@
+<!ENTITY DownloadScheduler "Download Scheduler">
+<!ENTITY ScheduleLinkAs "Schedule Link As… ">
+<!ENTITY DownloadSchedulerOptions "Download Scheduler Options">
+<!ENTITY Cancelselected "Cancel selected">
+<!ENTITY StartTime "Start time:">
+<!ENTITY PauseTime "Pause time:">
+<!ENTITY ConfirmClose "Confirm Close">
+<!ENTITY CloseMsg1 "You have scheduled downloads. Are you sure you want to quit the current firefox session?">
+<!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">
+

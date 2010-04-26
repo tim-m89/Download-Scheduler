@@ -1,0 +1,7 @@
+content     dlScheduler    chrome/content/
+
+locale	dlScheduler	en-US	chrome/locale/en-US/
+locale	dlScheduler	fr	chrome/locale/fr/
+
+overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/dlScheduler.xul
+

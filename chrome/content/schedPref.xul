@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://dlScheduler/locale/translations.dtd">
+<prefwindow
+    id="tim_matthews.downloadScheduler.schedPrefWindow"
+    title="&DownloadSchedulerOptions;"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    onload="tim_matthews.downloadScheduler.schedPref_js.prefLoad();">
+    <prefpane label="General">
+        <preferences>
+            <preference id="tim_matthews.downloadScheduler.prefWin.startTime" name="dlScheduler.startTime" type="string"/>
+            <preference id="tim_matthews.downloadScheduler.prefWin.finishTime" name="dlScheduler.finishTime" type="string"/>       
+        </preferences>
+        <grid width="200">
+            <columns>
+                <column flex="1"/>
+                <column flex="2"/>
+            </columns>
+            <rows>
+                <row>
+                    <label value="&StartTime;" />
+                    <label value="&PauseTime;" />
+                </row>
+                <row>
+                    <timepicker id="tim_matthews.downloadScheduler.prefWin.tp1" hideseconds="true" preference="tim_matthews.downloadScheduler.prefWin.startTime" />
+                    <timepicker id="tim_matthews.downloadScheduler.prefWin.tp2" hideseconds="true" preference="tim_matthews.downloadScheduler.prefWin.finishTime" />
+                </row>
+            </rows>
+        </grid>
+    </prefpane>
+    <script src="schedPref.js"></script>
+</prefwindow>
+

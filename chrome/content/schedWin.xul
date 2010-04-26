@@ -1,0 +1,17 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://dlScheduler/locale/translations.dtd">
+<window
+    id="tim_matthews.downloadScheduler.schedWin"
+    title="&DownloadScheduler;"
+    onload="tim_matthews.downloadScheduler.schedWin_js.init();"
+    windowtype="tim_matthews.downloadScheduler.schedWindow"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    width="360">
+    <script src="schedWin.js"></script>
+    <stack >
+        <listbox top="0" height="180" width="350" id="tim_matthews.downloadScheduler.schedWin.list1" />
+        <button top="190" width="130" label="&Cancelselected;" onclick="tim_matthews.downloadScheduler.schedWin_js.cancelDownload();" />
+    </stack>
+</window>
+
