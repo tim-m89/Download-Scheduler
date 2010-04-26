@@ -270,18 +270,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     }
   },
 
-  close: function(event) {
-    var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
-    if(downloadArray.length>=1) {
-      //alert("can't close");
-      return false;
-    }
-    else
-    {
-      return true;
-    }
-  }
-
 };
 
 window.addEventListener("load", tim_matthews.downloadScheduler.dlScheduler_js.init, false);
