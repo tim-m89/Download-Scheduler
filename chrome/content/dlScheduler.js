@@ -119,8 +119,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   startDownloads: function() {
       try {
           var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
-          if(downloadArray.length==0)
-              return;
 
           var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
           var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
