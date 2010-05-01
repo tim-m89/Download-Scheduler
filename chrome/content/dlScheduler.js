@@ -178,13 +178,17 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   pauseDownloads: function() {
       try {
-          var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
-          var activeDl = dm.activeDownloads;
-          while(activeDl.hasMoreElements())
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
+          if(prefs.getBoolPref("pauseEnabled"))
           {
-              var dl = activeDl.getNext().QueryInterface(Components.interfaces.nsIDownload);
-              if(dl.state==0)
-                  dm.pauseDownload(dl.id);
+            var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+            var activeDl = dm.activeDownloads;
+            while(activeDl.hasMoreElements())
+            {
+                var dl = activeDl.getNext().QueryInterface(Components.interfaces.nsIDownload);
+                if(dl.state==0)
+                    dm.pauseDownload(dl.id);
+            }
           }
 
           tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
