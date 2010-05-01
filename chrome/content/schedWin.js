@@ -42,6 +42,11 @@ tim_matthews.downloadScheduler.schedWin_js = {
           
           var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
 
+          var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+          targetFile.initWithPath(downloadArray[index].target);
+          if(targetFile.exists() && (targetFile.fileSize==0))
+            targetFile.remove(false);
+
           downloadArray.splice(index, 1);
 
           Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).set(downloadArray); 
