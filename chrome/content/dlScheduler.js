@@ -84,26 +84,22 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           if (contextMenu)
               contextMenu.addEventListener("popupshowing", tim_matthews.downloadScheduler.dlScheduler_js.thumbnailsShowHideItems, false);
 
-          var downloadArray = [];
-          Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  downloadArray);
 
           tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
 
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs.QueryInterface(Components.interfaces.nsIPrefBranch2);
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
+          prefs.QueryInterface(Components.interfaces.nsIPrefBranch2);
+          prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
+          tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = prefs;
           
-          var obsService = Components.classes["@mozilla.org/observer-service;1"].getService(Components.interfaces.nsIObserverService);
-          obsService.addObserver({
-          observe: function(subject, topic, data) {
-            var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
-            if((topic=="quit-application-requested") && (downloadArray.length>=1)){
-              var params = { abortClose: false };
-              window.openDialog("chrome://dlScheduler/content/closeDialog.xul", "", "chrome, dialog, modal, resizable=yes", params).focus();
-              subject.QueryInterface(Components.interfaces.nsISupportsPRBool);
-              subject.data = params.abortClose;
+          Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
+            get: function() {
+              return JSON.parse(prefs.getCharPref("dlScheduleList"));
+            },
+            set: function(arr) {
+              prefs.setCharPref("dlScheduleList", JSON.stringify(arr));
             }
-          } }, "quit-application-requested", false);
+          });
 
           Application.storage.set("tim_matthews.downloadScheduler.timer", tim_matthews.downloadScheduler.dlScheduler_js.timer);
 
@@ -118,7 +114,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   startDownloads: function() {
       try {
-          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
+          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
 
           var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
           var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
@@ -141,30 +137,34 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               if(dl.state==4)
                   dm.resumeDownload(dl.id);
           }
-   
+
           for (var i=0; i<downloadArray.length; i++)
           {
               var scheduleSlot = downloadArray[i];
               if((scheduleSlot == undefined) || (scheduleSlot==null))
                   continue;
 
-              //alert(scheduleSlot.targetURI);
-              //alert(scheduleSlot.targetFile.path);
-
               var obj_Persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
               const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
               const flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
               obj_Persist.persistFlags = flags | nsIWBP.PERSIST_FLAGS_FROM_CACHE;
 
-              var download = dm.addDownload(0, scheduleSlot.sourceURI, scheduleSlot.targetURI,  null, null, null, null, obj_Persist);
+              var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+              targetFile.initWithPath(scheduleSlot.target);
+              if(!targetFile.exists())
+                targetFile.create(0x00,0644);
+
+              var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(scheduleSlot.source, null, null);
+              var targetURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newFileURI(targetFile);
+              
+              var download = dm.addDownload(0, sourceURI, targetURI,  null, null, null, null, obj_Persist);
 
               obj_Persist.progressListener = download;
 
-              obj_Persist.saveURI(scheduleSlot.sourceURI, null, null, null, null, scheduleSlot.targetFile);
+              obj_Persist.saveURI(sourceURI, null, null, null, null, targetFile);
           }
 
-          downloadArray = [];
-          Application.storage.set("tim_matthews.downloadScheduler.downloadArray", downloadArray);
+          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set([]);
 
           var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
           if(scheduleWindow)
@@ -223,41 +223,32 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
           fp.init(window, "Enter name of file for scheduled download...", nsIFilePicker.modeSave);
           
-          var fileName = tim_matthews.downloadScheduler.dlScheduler_js.parseURL(gContextMenu.linkURL);
+          var source = gContextMenu.linkURL;
+
+          var fileName = tim_matthews.downloadScheduler.dlScheduler_js.parseURL(source);
           fp.defaultString = fileName.file;
           fp.defaultExtension = fileName.ext;
           if(fileName.ext.length > 0)
-          {
               fp.appendFilter(fileName.ext, "*." + fileName.ext);
-          }
           fp.appendFilter("All files (*.*)", "*.*");
 
           if(fp.show() == 1)
               return;
 
-          var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(gContextMenu.linkURL, null, null);
-
           var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-          
-          var myURL = fp.fileURL.QueryInterface(Components.interfaces.nsIURL);
-          //alert(fp.file.path);
           targetFile.initWithPath(fp.file.path);
 
-          var newFile = false;
+          if(!targetFile.exists())
+            targetFile.create(0x00,0644);
 
-      if(!targetFile.exists())
-          {
-        targetFile.create(0x00,0644);
-              newFile = true;
-          }
+          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
 
-          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
           var scheduleSlot = {};
-          scheduleSlot.sourceURI = sourceURI;
-          scheduleSlot.targetURI = fp.fileURL;
-          scheduleSlot.targetFile = targetFile;
-          scheduleSlot.newFile = newFile;
+          scheduleSlot.source = source;
+          scheduleSlot.target = fp.file.path;
           downloadArray.push(scheduleSlot);
+
+          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(downloadArray);
 
           var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
           if(scheduleWindow)
