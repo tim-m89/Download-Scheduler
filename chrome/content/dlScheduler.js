@@ -115,19 +115,22 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   startDownloads: function() {
       try {
           var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-
           var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
+
+          if((downloadArray.length==0) && (dm.activeDownloadCount==0))
+            return;
+
           var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
           var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-          if (dlmgrWindow)
+          if(dlmgrWindow)
           {
               if(prefs.getBoolPref("browser.download.manager.focusWhenStarting"))
-                  dlmgrWindow.focus();
+                dlmgrWindow.focus();
           }
           else
           {            
               if(prefs.getBoolPref("browser.download.manager.showWhenStarting"))
-                  openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
+                openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
           }
 
           var activeDl = dm.activeDownloads;
