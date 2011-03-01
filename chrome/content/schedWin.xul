@@ -9,9 +9,9 @@
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     width="360">
     <script src="schedWin.js"></script>
-    <stack >
-        <listbox top="0" height="180" width="350" id="tim_matthews.downloadScheduler.schedWin.list1" />
-        <button top="190" width="130" label="&Cancelselected;" onclick="tim_matthews.downloadScheduler.schedWin_js.cancelDownload();" />
-    </stack>
+    <vbox flex="1" pack="end">
+        <listbox minheight="40" minwidth="40" flex="1" id="tim_matthews.downloadScheduler.schedWin.list1" />
+        <button flex="1" minheight="30" maxheight="30" label="&Cancelselected;" onclick="tim_matthews.downloadScheduler.schedWin_js.cancelDownload();" />
+    </vbox>
 </window>
 
