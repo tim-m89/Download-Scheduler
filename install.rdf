@@ -19,10 +19,6 @@
     <em:creator>Tim Matthews</em:creator>
     <em:homepageURL>http://sites.google.com/site/downloadscheduler/</em:homepageURL>
     <em:optionsURL>chrome://dlScheduler/content/schedPref.xul</em:optionsURL>
-    <em:file>
-        <em:locale>locale/en-US/</em:locale>
-        <em:locale>locale/fr/</em:locale>
-    </em:file>
     </Description>      
 </RDF>
 
