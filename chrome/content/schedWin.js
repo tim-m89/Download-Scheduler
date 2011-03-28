@@ -34,6 +34,12 @@ tim_matthews.downloadScheduler.schedWin_js = {
       }
   },
 
+  addDownload: function() {
+  },
+
+  editDownload: function() {
+  },
+
   cancelDownload: function() {
       try {
           var index = tim_matthews.downloadScheduler.schedWin_js.list1.selectedIndex;

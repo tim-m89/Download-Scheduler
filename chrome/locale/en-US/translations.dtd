@@ -1,6 +1,8 @@
 <!ENTITY DownloadScheduler "Download Scheduler">
 <!ENTITY ScheduleLinkAs "Schedule Link As… ">
 <!ENTITY DownloadSchedulerOptions "Download Scheduler Options">
+<!ENTITY Addnew "Add new">
+<!ENTITY Editselected "Edit selected">
 <!ENTITY Cancelselected "Cancel selected">
 <!ENTITY StartTime "Start time:">
 <!ENTITY PauseTime "Pause time:">

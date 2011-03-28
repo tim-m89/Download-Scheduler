@@ -1,7 +1,9 @@
 <!ENTITY DownloadScheduler "Télécharger ordonnanceur">
 <!ENTITY ScheduleLinkAs "Horaire du lien sous… ">
 <!ENTITY DownloadSchedulerOptions "Télécharger le Planificateur Options">
-<!ENTITY Cancelselected "Annuler le style sélectionné">
+<!ENTITY Addnew "Ajouter un nouveau">
+<!ENTITY Editselected "Modifier la sélection">
+<!ENTITY Cancelselected "Annuler la sélection">
 <!ENTITY StartTime "Heure de début:">
 <!ENTITY PauseTime "Temps de pause:">
 <!ENTITY ConfirmClose "Confirmer le fermer">
