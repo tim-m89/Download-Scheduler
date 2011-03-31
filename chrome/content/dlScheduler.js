@@ -98,6 +98,26 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
             },
             set: function(arr) {
               prefs.setCharPref("dlScheduleList", JSON.stringify(arr));
+            },
+            addOne: function(remote, local) {
+              var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+              targetFile.initWithPath(local);
+
+              if(!targetFile.exists())
+                targetFile.create(0x00,0644);
+
+              var downloadArray = this.get();
+
+              var scheduleSlot = {};
+              scheduleSlot.source = remote;
+              scheduleSlot.target = local;
+              downloadArray.push(scheduleSlot);
+
+              this.set(downloadArray);
+
+              var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
+              if(scheduleWindow)
+                scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
             }
           });
 
@@ -223,7 +243,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       return fileName;
   },
 
-  scheduleDownload: function() {
+  scheduleLinkAs: function() {
     try {
           var nsIFilePicker = Components.interfaces.nsIFilePicker;
           var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
@@ -248,18 +268,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           if(!targetFile.exists())
             targetFile.create(0x00,0644);
 
-          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-
-          var scheduleSlot = {};
-          scheduleSlot.source = source;
-          scheduleSlot.target = fp.file.path;
-          downloadArray.push(scheduleSlot);
-
-          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(downloadArray);
-
-          var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
-          if(scheduleWindow)
-              scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
+          Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fp.file.path);
 
     } catch (e) {
       alert(e);

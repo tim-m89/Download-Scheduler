@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://dlScheduler/locale/translations.dtd">
+<window
+    id="tim_matthews.downloadScheduler.addNewWin"
+    title="&Addnew;"
+    windowtype="tim_matthews.downloadScheduler.schedWindow"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    width="360">
+    <script src="addNewWin.js"></script>
+</window>
+

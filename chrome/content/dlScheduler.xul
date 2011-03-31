@@ -8,7 +8,7 @@
     </menupopup>
     <popup id="contentAreaContextMenu">    
         <menuseparator id="tim_matthews.downloadScheduler.context-separator1" />
-        <menuitem id="tim_matthews.downloadScheduler.context-schedulelink" insertafter="tim_matthews.downloadScheduler.context-separator1" label="&ScheduleLinkAs;" oncommand="tim_matthews.downloadScheduler.dlScheduler_js.scheduleDownload();"/>
+        <menuitem id="tim_matthews.downloadScheduler.context-schedulelink" insertafter="tim_matthews.downloadScheduler.context-separator1" label="&ScheduleLinkAs;" oncommand="tim_matthews.downloadScheduler.dlScheduler_js.scheduleLinkAs();"/>
     </popup>
 </overlay>
 
