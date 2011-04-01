@@ -10,7 +10,7 @@
     width="360">
     <script src="schedWin.js"></script>
     <vbox flex="1" pack="end">
-        <listbox minheight="40" minwidth="40" flex="1" id="tim_matthews.downloadScheduler.schedWin.list1" />
+        <listbox minheight="40" minwidth="40" flex="1" id="tim_matthews.downloadScheduler.schedWin.list1" ondblclick="tim_matthews.downloadScheduler.schedWin_js.editDownload();" />
         <hbox>
           <button flex="1" minheight="30" maxheight="30" label="&Addnew;" onclick="tim_matthews.downloadScheduler.schedWin_js.addDownload();" />
           <button flex="1" minheight="30" maxheight="30" label="&Editselected;" onclick="tim_matthews.downloadScheduler.schedWin_js.editDownload();" />

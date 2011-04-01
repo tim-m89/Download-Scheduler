@@ -10,3 +10,5 @@
 <!ENTITY CloseMsg1 "Vous avez planifié téléchargements. Etes-vous sûr de vouloir quitter la session actuelle de Firefox?">
 <!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les téléchargements prévue sera annulée.">
 <!ENTITY Enabled "Activé">
+<!ENTITY AddEdit "Ajouter / Modifier">
+

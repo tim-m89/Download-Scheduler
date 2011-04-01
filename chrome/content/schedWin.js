@@ -36,12 +36,23 @@ tim_matthews.downloadScheduler.schedWin_js = {
 
   addDownload: function() {
     try {
-          window.openDialog("chrome://dlScheduler/content/addNewWin.xul", "tim_matthews.downloadScheduler.addNewWin", "chrome, modal, width=490, height=100, resizable=no" );
+          window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal, width=490, height=100, resizable=no", -1);
           tim_matthews.downloadScheduler.schedWin_js.refreshList();
       } catch(e) { alert(e); }
   },
 
   editDownload: function() {
+      try {
+          var index = tim_matthews.downloadScheduler.schedWin_js.list1.selectedIndex;
+          if(index == -1)
+              return;
+          
+          window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal, width=490, height=100, resizable=no", index);
+          tim_matthews.downloadScheduler.schedWin_js.refreshList();
+      } catch (e) {
+          alert(e);
+      }
+
   },
 
   cancelDownload: function() {

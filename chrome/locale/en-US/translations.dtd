@@ -10,3 +10,5 @@
 <!ENTITY CloseMsg1 "You have scheduled downloads. Are you sure you want to quit the current firefox session?">
 <!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">
 <!ENTITY Enabled "Enabled">
+<!ENTITY AddEdit "Add / Edit">
+
