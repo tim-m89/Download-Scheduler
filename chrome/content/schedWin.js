@@ -36,10 +36,9 @@ tim_matthews.downloadScheduler.schedWin_js = {
 
   addDownload: function() {
     try {
-          window.openDialog("chrome://dlScheduler/content/addNewWin.xul", "tim_matthews.downloadScheduler.addNewWin", "chrome, modal, width=360, height=220, resizable=yes" );
-        } catch (e) { 
-          alert(e);
-      }
+          window.openDialog("chrome://dlScheduler/content/addNewWin.xul", "tim_matthews.downloadScheduler.addNewWin", "chrome, modal, width=490, height=100, resizable=no" );
+          tim_matthews.downloadScheduler.schedWin_js.refreshList();
+      } catch(e) { alert(e); }
   },
 
   editDownload: function() {

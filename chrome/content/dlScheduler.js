@@ -99,7 +99,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
             set: function(arr) {
               prefs.setCharPref("dlScheduleList", JSON.stringify(arr));
             },
-            addOne: function(remote, local) {
+            addOne: function(remote, local, recurring) {
               var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
               targetFile.initWithPath(local);
 
@@ -111,14 +111,36 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               var scheduleSlot = {};
               scheduleSlot.source = remote;
               scheduleSlot.target = local;
+              scheduleSlot.recurring = recurring;
               downloadArray.push(scheduleSlot);
 
               this.set(downloadArray);
 
               var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
-              if(scheduleWindow)
+              if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
                 scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
-            }
+            },
+            parseURL: function(url) {
+              var fileName = {};
+              fileName.file = "";
+              fileName.ext = "";
+              var slash = url.split("/");
+              if(slash.length > 0)
+              {
+                var file = slash[slash.length-1];
+                if( (file.length > 0) && (file.indexOf("?") == -1) )
+                {
+                  var dot = file.split(".");
+                  if(dot.length > 0)
+                  {
+                    var ext = dot[dot.length-1];
+                    fileName.file = file;
+                    fileName.ext = ext;
+                  }
+                }
+              }
+              return fileName;
+            },
           });
 
           Application.storage.set("tim_matthews.downloadScheduler.timer", tim_matthews.downloadScheduler.dlScheduler_js.timer);
@@ -161,6 +183,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
                   dm.resumeDownload(dl.id);
           }
 
+          var newDownloadArray = [];
+
           for (var i=0; i<downloadArray.length; i++)
           {
               var scheduleSlot = downloadArray[i];
@@ -185,9 +209,12 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               obj_Persist.progressListener = download;
 
               obj_Persist.saveURI(sourceURI, null, null, null, null, targetFile);
+
+              if(scheduleSlot.recurring)
+                newDownloadArray.push(scheduleSlot);
           }
 
-          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set([]);
+          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(newDownloadArray);
 
           var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
           if(scheduleWindow)
@@ -221,28 +248,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       }
   },
 
-  parseURL: function(url) {
-      var fileName = {};
-      fileName.file = "";
-      fileName.ext = "";
-      var slash = url.split("/");
-      if(slash.length > 0)
-      {
-          var file = slash[slash.length-1];
-          if( (file.length > 0) && (file.indexOf("?") == -1) )
-          {
-              var dot = file.split(".");
-              if(dot.length > 0)
-              {
-                  var ext = dot[dot.length-1];
-                  fileName.file = file;
-                  fileName.ext = ext;
-              }
-          }
-      }
-      return fileName;
-  },
-
   scheduleLinkAs: function() {
     try {
           var nsIFilePicker = Components.interfaces.nsIFilePicker;
@@ -252,7 +257,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           
           var source = gContextMenu.linkURL;
 
-          var fileName = tim_matthews.downloadScheduler.dlScheduler_js.parseURL(source);
+          var fileName = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).parseURL(source);
           fp.defaultString = fileName.file;
           fp.defaultExtension = fileName.ext;
           if(fileName.ext.length > 0)
@@ -268,7 +273,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           if(!targetFile.exists())
             targetFile.create(0x00,0644);
 
-          Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fp.file.path);
+          Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fp.file.path, false);
 
     } catch (e) {
       alert(e);
