@@ -11,4 +11,7 @@
 <!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les téléchargements prévue sera annulée.">
 <!ENTITY Enabled "Activé">
 <!ENTITY AddEdit "Ajouter / Modifier">
-
+<!ENTITY TargetFileToolTip "Fichier de destination. Double-cliquez pour ouvrir sélecteur de fichier.">
+<!ENTITY EnterSourceURL "Entrez l'URL de la source">
+<!ENTITY ChooseTargetFile "Choisissez le fichier cible">
+<!ENTITY Recurring "Récurrents">

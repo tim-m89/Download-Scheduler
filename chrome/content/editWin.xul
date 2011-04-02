@@ -11,12 +11,12 @@
     <vbox>
       <hbox>
         <vbox>
-          <label control="tim_matthews.downloadScheduler.editWin.source" value="Enter Source URL" />
+          <label control="tim_matthews.downloadScheduler.editWin.source" value="&EnterSourceURL;" />
           <textbox id="tim_matthews.downloadScheduler.editWin.source" value="http://" />
         </vbox>
         <vbox>
-          <label control="tim_matthews.downloadScheduler.editWin.target" value="Choose target file" />
-          <hbox><textbox id="tim_matthews.downloadScheduler.editWin.target" value="Target File" tooltiptext="Destination File. Double Click to open file chooser" ondblclick="tim_matthews.downloadScheduler.editWin_js.chooseFile();" /><checkbox id="tim_matthews.downloadScheduler.editWin.recurring" label="Recurring" /></hbox>
+          <label control="tim_matthews.downloadScheduler.editWin.target" value="&ChooseTargetFile;" />
+          <hbox><textbox id="tim_matthews.downloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="tim_matthews.downloadScheduler.editWin_js.chooseFile();" /><checkbox id="tim_matthews.downloadScheduler.editWin.recurring" label="&Recurring;" /></hbox>
         </vbox>
       </hbox>
       <hbox>

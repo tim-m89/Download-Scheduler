@@ -11,4 +11,7 @@
 <!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">
 <!ENTITY Enabled "Enabled">
 <!ENTITY AddEdit "Add / Edit">
-
+<!ENTITY TargetFileToolTip "Destination File. Double Click to open file chooser.">
+<!ENTITY EnterSourceURL "Enter source URL">
+<!ENTITY ChooseTargetFile "Choose target file">
+<!ENTITY Recurring "Recurring">
