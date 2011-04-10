@@ -1,7 +1,13 @@
 content     dlScheduler    chrome/content/
 
+locale	dlScheduler	de	chrome/locale/de/
+locale	dlScheduler	el	chrome/locale/el/
 locale	dlScheduler	en-US	chrome/locale/en-US/
+locale	dlScheduler	es-ES	chrome/locale/es-ES/
 locale	dlScheduler	fr	chrome/locale/fr/
+locale	dlScheduler	it	chrome/locale/it/
+locale	dlScheduler	nl	chrome/locale/nl/
+locale	dlScheduler	sv-SE	chrome/locale/sv-SE/
 
 overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/dlScheduler.xul
 overlay chrome://mozapps/content/downloads/unknownContentType.xul chrome://dlScheduler/content/unknownContentType.xul
