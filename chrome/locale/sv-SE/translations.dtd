@@ -1,0 +1,17 @@
+<!ENTITY DownloadScheduler "Hämtningsschemaläggaren">
+<!ENTITY ScheduleLinkAs "Schemalägg länk som…">
+<!ENTITY DownloadSchedulerOptions "Inställningar för Download Scheduler">
+<!ENTITY Addnew "Lägg till ny">
+<!ENTITY Editselected "Redigera markerade">
+<!ENTITY Cancelselected "Avbryt markerade">
+<!ENTITY StartTime "Starttid:">
+<!ENTITY PauseTime "Pauseringstid:">
+<!ENTITY ConfirmClose "Bekräfta programavslut">
+<!ENTITY CloseMsg1 "Du har schemalagda hämtningar. Är du säker på att du vill avsluta den aktuella Firefox-sessionen?">
+<!ENTITY CloseMsg2 "Om du väljer &quot;OK&quot; kommer alla schemalagda hämtningar att avbrytas.">
+<!ENTITY Enabled "Aktiverat">
+<!ENTITY AddEdit "Lägg till/Redigera">
+<!ENTITY TargetFileToolTip "Målfil. Dubbelklicka för att öppna filväljaren.">
+<!ENTITY EnterSourceURL "Ange käll-URL">
+<!ENTITY ChooseTargetFile "Välj målfil">
+<!ENTITY Recurring "Återkommande">

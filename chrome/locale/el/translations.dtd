@@ -1,0 +1,17 @@
+<!ENTITY DownloadScheduler "Λήψη Scheduler">
+<!ENTITY ScheduleLinkAs "Πρόγραμμα δεσμού ως… ">
+<!ENTITY DownloadSchedulerOptions "Λήψη Επιλογές Scheduler">
+<!ENTITY Addnew "Προσθήκη νέων">
+<!ENTITY Editselected "Επεξεργασία επιλεγμένων">
+<!ENTITY Cancelselected "Ακύρωση επιλεγμένων">
+<!ENTITY StartTime "Ώρα έναρξης:">
+<!ENTITY PauseTime "Παύση του χρόνου:">
+<!ENTITY ConfirmClose "Επιβεβαίωση Κλείσιμο">
+<!ENTITY CloseMsg1 "Έχετε προγραμματισμένες λήψεις. Είστε σίγουροι ότι θέλετε να κλείσετε την τρέχουσα περίοδο λειτουργίας του Firefox;">
+<!ENTITY CloseMsg2 "Εάν επιλέξετε 'OK 'για όλες τις προγραμματισμένες λήψεις θα ματαιωθεί.">
+<!ENTITY Enabled "Ενεργοποιήθηκε">
+<!ENTITY AddEdit "Προσθήκη / Επεξεργασία">
+<!ENTITY TargetFileToolTip "Αρχείο προορισμού. Διπλό κλικ για να ανοίξετε επιλογέα αρχείων.">
+<!ENTITY EnterSourceURL "Εισαγωγή URL πηγή">
+<!ENTITY ChooseTargetFile "Επιλέξτε αρχείο προορισμού">
+<!ENTITY Recurring "Επαναλαμβανόμενη">

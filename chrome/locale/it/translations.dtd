@@ -1,0 +1,17 @@
+<!ENTITY DownloadScheduler "Scarica Scheduler">
+<!ENTITY ScheduleLinkAs "Programma collegamento con nome… ">
+<!ENTITY DownloadSchedulerOptions "Scarica Scheduler Opzioni">
+<!ENTITY Addnew "Aggiungi nuovo">
+<!ENTITY Editselected "Modifica selezionati">
+<!ENTITY Cancelselected "Annulla selezionati">
+<!ENTITY StartTime "Ora di inizio:">
+<!ENTITY PauseTime "Tempo di pausa:">
+<!ENTITY ConfirmClose "Conferma Chiudi">
+<!ENTITY CloseMsg1 "Hai in programma di download. Sei sicuro di voler chiudere la sessione corrente di Firefox?">
+<!ENTITY CloseMsg2 "Se scegli 'OK' tutti i download di linea sarà interrotta.">
+<!ENTITY Enabled "Attivato">
+<!ENTITY AddEdit "Aggiungi / Modifica">
+<!ENTITY TargetFileToolTip "File di destinazione. Doppio clic per aprire selettore di file.">
+<!ENTITY EnterSourceURL "Inserisci URL fonte">
+<!ENTITY ChooseTargetFile "Scegli il file di destinazione">
+<!ENTITY Recurring "Ricorrenti">

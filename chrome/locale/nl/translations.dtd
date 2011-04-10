@@ -1,0 +1,17 @@
+<!ENTITY DownloadScheduler "Download Scheduler">
+<!ENTITY ScheduleLinkAs "Als Bijlage Link… ">
+<!ENTITY DownloadSchedulerOptions "Download Scheduler Opties">
+<!ENTITY Addnew "Voeg een nieuwe">
+<!ENTITY Editselected "Bewerken geselecteerd">
+<!ENTITY Cancelselected "Annuleren geselecteerd">
+<!ENTITY StartTime "Start tijd:">
+<!ENTITY PauseTime "Pauze tijd:">
+<!ENTITY ConfirmClose "Bevestig sluiten">
+<!ENTITY CloseMsg1 "Je hebt gepland downloads. Ben je zeker dat je de huidige Firefox-sessie afsluiten?">
+<!ENTITY CloseMsg2 "Als u kiest voor 'OK' voor alle geregistreerde downloads worden afgebroken.">
+<!ENTITY Enabled "Ingeschakeld">
+<!ENTITY AddEdit "Add / Edit">
+<!ENTITY TargetFileToolTip "Doelbestand. Dubbel Klik om het bestand Kiezer openen.">
+<!ENTITY EnterSourceURL "Voer bron URL">
+<!ENTITY ChooseTargetFile "Kies doelbestand">
+<!ENTITY Recurring "Recurrente">
