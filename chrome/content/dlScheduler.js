@@ -31,9 +31,9 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     setupTimer: function() {
         this.cancel();
 
-        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
-        var startHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("startTime"));
-        var finishHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("finishTime"));
+        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+        var startHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.startTime"));
+        var finishHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.finishTime"));
 
         /* Set the next start time from today */
         
@@ -87,17 +87,17 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
           tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
 
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
-          prefs.QueryInterface(Components.interfaces.nsIPrefBranch2);
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+          //prefs.QueryInterface(Components.interfaces.nsIPrefBranch2);
           prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
           tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = prefs;
           
           Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
             get: function() {
-              return JSON.parse(prefs.getCharPref("dlScheduleList"));
+              return JSON.parse(prefs.getCharPref("dlScheduler.dlScheduleList"));
             },
             set: function(arr) {
-              prefs.setCharPref("dlScheduleList", JSON.stringify(arr));
+              prefs.setCharPref("dlScheduler.dlScheduleList", JSON.stringify(arr));
             },
             addOne: function(remote, local, recurring) {
               var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
@@ -163,7 +163,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
             return;
 
           var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
           if(dlmgrWindow)
           {
               if(prefs.getBoolPref("browser.download.manager.focusWhenStarting"))
@@ -228,8 +228,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   pauseDownloads: function() {
       try {
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefService).getBranch("dlScheduler.");
-          if(prefs.getBoolPref("pauseEnabled"))
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+          if(prefs.getBoolPref("dlScheduler.pauseEnabled"))
           {
             var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
             var activeDl = dm.activeDownloads;
