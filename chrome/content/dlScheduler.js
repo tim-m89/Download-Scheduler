@@ -147,17 +147,21 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
           var oldIP = internalPersist;
           internalPersist = function(persistArgs) {
-          var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
-          var check = {value: false};
-          var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
-          var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
-          if(button==0)
-            oldIP(persistArgs);
-          else if(button=1)
-            return;
-          else if(button=2)
-            Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(persistArgs.sourceURI.resolve(""), persistArgs.targetFile.path, false);
-         }; 
+            if(persistArgs.sourceDocument)
+              oldIP(persistArgs); //only have option to schedule if not saving document
+            else {
+              var prompts = Components.classes["@mozilla.org/embedcomp/prompt-service;1"].getService(Components.interfaces.nsIPromptService);
+              var check = {value: false};
+              var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
+              var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
+              if(button==0)
+                oldIP(persistArgs);
+              else if(button=1)
+                return;
+              else if(button=2)
+                Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(persistArgs.sourceURI.resolve(""), persistArgs.targetFile.path, false);
+            }
+        };
       } catch (e) {
           alert(e);
       }
