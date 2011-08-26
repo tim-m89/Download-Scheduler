@@ -10,5 +10,4 @@ locale	dlScheduler	nl	chrome/locale/nl/
 locale	dlScheduler	sv-SE	chrome/locale/sv-SE/
 
 overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/dlScheduler.xul
-overlay chrome://mozapps/content/downloads/unknownContentType.xul chrome://dlScheduler/content/unknownContentType.xul
 

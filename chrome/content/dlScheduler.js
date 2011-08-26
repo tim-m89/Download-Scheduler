@@ -156,9 +156,9 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
               if(button==0)
                 oldIP(persistArgs);
-              else if(button=1)
+              else if(button==1)
                 return;
-              else if(button=2)
+              else if(button==2)
                 Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(persistArgs.sourceURI.resolve(""), persistArgs.targetFile.path, false);
             }
         };
