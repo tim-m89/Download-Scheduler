@@ -93,10 +93,12 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           
           Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
             get: function() {
-              return JSON.parse(prefs.getCharPref("dlScheduler.dlScheduleList"));
+              return JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data);
             },
             set: function(arr) {
-              prefs.setCharPref("dlScheduler.dlScheduleList", JSON.stringify(arr));
+              var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+              str.data = JSON.stringify(arr);
+              prefs.setComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
             },
             addOne: function(remote, local, recurring) {
               var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
@@ -285,7 +287,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               return;
 
           var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-          targetFile.initWithPath(fp.file.path);
+          targetFile.initWithFile(fp.file);
 
           if(!targetFile.exists())
             targetFile.create(0x00,0644);
