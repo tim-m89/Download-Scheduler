@@ -170,7 +170,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   },
  
   showScheduler: function() {
-      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=220, resizable=yes" );
+      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=220, resizable=yes" ).focus();
   },
 
   startDownloads: function() {
