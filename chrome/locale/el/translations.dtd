@@ -15,3 +15,4 @@
 <!ENTITY EnterSourceURL "Εισαγωγή URL πηγή">
 <!ENTITY ChooseTargetFile "Επιλέξτε αρχείο προορισμού">
 <!ENTITY Recurring "Επαναλαμβανόμενη">
+<!ENTITY RecurringToolTip "Όταν επιλεγεί, στοιχείο παραμένει στη λίστα πρόγραμμα κατά την λήψη ξεκινήσει για την επόμενη φορά.">

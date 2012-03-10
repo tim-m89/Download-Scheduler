@@ -15,3 +15,4 @@
 <!ENTITY EnterSourceURL "Introduzca la URL de la fuente">
 <!ENTITY ChooseTargetFile "Elija el archivo de destino">
 <!ENTITY Recurring "Recurrente">
+<!ENTITY RecurringToolTip "Cuando se selecciona, el tema permanece en la lista de programación en el arranque de descarga para la próxima vez.">

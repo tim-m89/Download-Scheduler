@@ -15,3 +15,4 @@
 <!ENTITY EnterSourceURL "Geben Sie Quell-URL">
 <!ENTITY ChooseTargetFile "Wählen Sie die Zieldatei">
 <!ENTITY Recurring "Wiederkehrend">
+<!ENTITY RecurringToolTip "Wenn diese Option aktiviert, bleibt Element in der Liste Zeitplan auf Download zu starten für die nächste Zeit.">
