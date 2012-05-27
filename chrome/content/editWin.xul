@@ -21,10 +21,6 @@
       </hbox>
       <hbox>
         <button height="30" width="100" label="Save" onclick="tim_matthews.downloadScheduler.editWin_js.save();" />
-        <radiogroup>
-          <hbox><radio id="frompref" /></hbox>
-          <hbox><radio id="chosen" /></hbox>
-        </radiogroup>
         <spacer />
       </hbox>
     </vbox>
