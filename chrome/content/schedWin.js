@@ -17,6 +17,7 @@ tim_matthews.downloadScheduler.schedWin_js = {
 
   refreshList: function() {
       try {
+          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
           while(tim_matthews.downloadScheduler.schedWin_js.list1.itemCount > 0)
               tim_matthews.downloadScheduler.schedWin_js.list1.removeItemAt(0);
 
@@ -57,6 +58,7 @@ tim_matthews.downloadScheduler.schedWin_js = {
 
   cancelDownload: function() {
       try {
+          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
           var index = tim_matthews.downloadScheduler.schedWin_js.list1.selectedIndex;
           if(index == -1)
               return;

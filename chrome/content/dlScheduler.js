@@ -91,6 +91,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
           tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = prefs;
           
+          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication); 
           Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
             get: function() {
               return JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data);
@@ -175,6 +176,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   startDownloads: function() {
       try {
+          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
           var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
           var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
 
@@ -269,7 +271,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   scheduleLinkAs: function() {
     try {
-          var nsIFilePicker = Components.interfaces.nsIFilePicker;
+          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
+          const nsIFilePicker = Components.interfaces.nsIFilePicker;
           var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
 
           fp.init(window, "Enter name of file for scheduled download...", nsIFilePicker.modeSave);

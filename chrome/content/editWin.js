@@ -5,6 +5,7 @@ if(!tim_matthews.downloadScheduler.editWin_js) tim_matthews.downloadScheduler.ed
 tim_matthews.downloadScheduler.editWin_js = {
 
   loadDownload: function() {
+    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
     var index = window.arguments[0];
     if(index>=0) {
       var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
@@ -17,6 +18,7 @@ tim_matthews.downloadScheduler.editWin_js = {
 
   chooseFile: function() {
     try {
+    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
     var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
     fp.init(window, "Enter name of file for scheduled download...", nsIFilePicker.modeSave);
@@ -42,6 +44,7 @@ tim_matthews.downloadScheduler.editWin_js = {
 
   save: function() {
     var index = window.arguments[0];
+    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
     if(index>=0) {
       var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
       var scheduleSlot = downloadArray[index];
