@@ -224,12 +224,16 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
               var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(scheduleSlot.source, null, null);
               var targetURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newFileURI(targetFile);
+
+              var privacyContext = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+                  .getInterface(Components.interfaces.nsIWebNavigation)
+                  .QueryInterface(Components.interfaces.nsILoadContext);
               
-              var download = dm.addDownload(0, sourceURI, targetURI,  null, null, null, null, obj_Persist);
+              var download = dm.addDownload(0, sourceURI, targetURI,  null, null, null, null, obj_Persist, privacyContext);
 
               obj_Persist.progressListener = download;
 
-              obj_Persist.saveURI(sourceURI, null, null, null, null, targetFile);
+              obj_Persist.saveURI(sourceURI, null, null, null, null, targetFile, privacyContext);
 
               if(scheduleSlot.recurring)
                 newDownloadArray.push(scheduleSlot);
