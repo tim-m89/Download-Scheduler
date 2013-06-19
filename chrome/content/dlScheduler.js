@@ -273,37 +273,96 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       }
   },
 
+
+
+  getFileName: function(aURL, aContentDisposition) { //coppied and trimmed from ContentAreaUtils
+
+  var saveMode = GetSaveModeForContentType(null, null);
+
+  var file, sourceURI, saveAsType;
+  // Find the URI object for aURL and the FileName/Extension to use when saving.
+  // FileName/Extension will be ignored if aChosenData supplied.
+    var fileInfo = new FileInfo(null);
+    initFileInfo(fileInfo, aURL, null, null,
+                 null, aContentDisposition);
+    sourceURI = fileInfo.uri;
+
+    var fpParams = {
+      fpTitleKey: null, //todo add to string bundle: "Enter name of file for scheduled download...",
+      fileInfo: fileInfo,
+      contentType: null,
+      saveMode: saveMode,
+      saveAsType: kSaveAsType_Complete,
+      file: file
+    };
+
+    if (!getTargetFile(fpParams, false))
+      // If the method returned false this is because the user cancelled from
+      // the save file picker dialog.
+      return null;
+
+    saveAsType = fpParams.saveAsType;
+    file = fpParams.file;
+    return file;
+
+  },
+
+
   scheduleLinkAs: function() {
-    try {
-          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
-          const nsIFilePicker = Components.interfaces.nsIFilePicker;
-          var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
+    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
 
-          fp.init(window, "Enter name of file for scheduled download...", nsIFilePicker.modeSave);
-          
-          var source = gContextMenu.linkURL;
+    var source = gContextMenu.linkURL;
 
-          var fileName = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).parseURL(source);
-          fp.defaultString = fileName.file;
-          fp.defaultExtension = fileName.ext;
-          if(fileName.ext.length > 0)
-              fp.appendFilter(fileName.ext, "*." + fileName.ext);
-          fp.appendFilter("All files (*.*)", "*.*");
+    var headerLocation = null;
+    var headerContentDisp = null
 
-          if(fp.show() == 1)
-              return;
 
-          var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-          targetFile.initWithFile(fp.file);
+    var isRedirect = false;
 
-          if(!targetFile.exists())
-            targetFile.create(0x00,0644);
+    // the IO service
+    var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
 
-          Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fp.file.path, false);
+    do {
+      // create an nsIURI
+      var uri = ioService.newURI(headerLocation == null ? source : headerLocation, null, null);
 
-    } catch (e) {
-      alert(e);
-    }
+      // get a channel for that nsIURI
+      var ch = ioService.newChannelFromURI(uri);
+      ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
+
+      var stream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
+      stream.init(ch.open());
+
+      try {
+        headerLocation = ch.getResponseHeader("location")
+      } catch (ex) {}
+      try {
+        headerContentDisp = ch.getResponseHeader("content-disposition");
+      } catch (ex) {}
+
+      stream.close;
+      isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+
+    } while(isRedirect)
+
+    var fileName; 
+
+    if( headerLocation != null)
+      fileName =  tim_matthews.downloadScheduler.dlScheduler_js.getFileName(headerLocation, headerContentDisp);
+    else
+      fileName = tim_matthews.downloadScheduler.dlScheduler_js.getFileName(source, headerContentDisp);
+
+    if( fileName == null)
+      return;
+
+    var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+    targetFile.initWithFile(fileName);
+
+    if(!targetFile.exists())
+      targetFile.create(0x00,0644);
+
+    Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName.path, false);
+
   },
 
 };
