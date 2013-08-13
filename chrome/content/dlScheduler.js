@@ -275,7 +275,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
 
 
-  getFileName: function(aURL, aContentDisposition) { //coppied and trimmed from ContentAreaUtils
+  getFileName: function(aURL, aContentDisposition, aCallback) {
 
   var saveMode = GetSaveModeForContentType(null, null);
 
@@ -296,14 +296,28 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       file: file
     };
 
-    if (!getTargetFile(fpParams, false))
-      // If the method returned false this is because the user cancelled from
-      // the save file picker dialog.
-      return null;
 
-    saveAsType = fpParams.saveAsType;
-    file = fpParams.file;
-    return file;
+    var VersionComparator = Components.classes['@mozilla.org/xpcom/version-comparator;1'].getService(Components.interfaces.nsIVersionComparator);
+    var AppInfo = Components.classes['@mozilla.org/xre/app-info;1'].getService(Components.interfaces.nsIXULAppInfo);
+    const FIREFOX_ID = '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}';
+    const THUNDERBIRD_ID = '{3550f703-e582-4d05-9a08-453d09bdfdc6}';
+    const SEAMONKEY_ID = '{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}';
+    const appId = AppInfo.ID;
+    const appVersion = AppInfo.version;
+    
+    var getTargetFileAsync = getTargetFile;     //This is because of a breaking change in 23
+    if (appId == FIREFOX_ID && VersionComparator.compare(appVersion, '23.0a1') < 0 ||
+        appId == SEAMONKEY_ID && VersionComparator.compare(appVersion, '2.20a1') < 0) {
+            getTargetFileAsync = function(aFpP, aCallback, aSkipPrompt, aRelatedURI) {
+            var dialogCancelled = getTargetFile(aFpP, aSkipPrompt, aRelatedURI) === false;
+            aCallback(dialogCancelled);
+        };
+    }
+
+    getTargetFileAsync(fpParams, function(aDialogCancelled) {
+        if (!aDialogCancelled)
+            aCallback(fpParams.file);
+    }, false );
 
   },
 
@@ -345,24 +359,29 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
     } while(isRedirect)
 
-    var fileName; 
+    var fileNameSource;
 
     if( headerLocation != null)
-      fileName =  tim_matthews.downloadScheduler.dlScheduler_js.getFileName(headerLocation, headerContentDisp);
+      fileNameSource = headerLocation;
     else
-      fileName = tim_matthews.downloadScheduler.dlScheduler_js.getFileName(source, headerContentDisp);
+      fileNameSource = source;
 
-    if( fileName == null)
-      return;
+    fileName = tim_matthews.downloadScheduler.dlScheduler_js.getFileName(fileNameSource, headerContentDisp, function(fileName) {
 
-    var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-    targetFile.initWithFile(fileName);
+      if( fileName == null)
+        return;
+    
 
-    if(!targetFile.exists())
+      var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+      targetFile.initWithFile(fileName);
+
+      if(!targetFile.exists())
       targetFile.create(0x00,0644);
 
-    Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName.path, false);
 
+      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName.path, false);
+
+    });
   },
 
 };
