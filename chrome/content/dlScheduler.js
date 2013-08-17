@@ -366,7 +366,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     else
       fileNameSource = source;
 
-    fileName = tim_matthews.downloadScheduler.dlScheduler_js.getFileName(fileNameSource, headerContentDisp, function(fileName) {
+      tim_matthews.downloadScheduler.dlScheduler_js.getFileName(fileNameSource, headerContentDisp, function(fileName) {
 
       if( fileName == null)
         return;
