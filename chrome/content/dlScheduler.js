@@ -31,7 +31,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     setupTimer: function() {
         this.cancel();
 
-        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
         var startHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.startTime"));
         var finishHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.finishTime"));
 
@@ -87,7 +87,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
           tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
 
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
           prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
           tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = prefs;
           
@@ -175,85 +175,72 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   },
 
   startDownloads: function() {
-      try {
-          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
-          var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-          var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
 
-          if((downloadArray.length==0) && (dm.activeDownloadCount==0))
-            return;
+  var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
+  var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
+  Components.utils.import("resource://gre/modules/Downloads.jsm");
+  var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
+  var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
 
-          var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
-          if(dlmgrWindow)
-          {
-              if(prefs.getBoolPref("browser.download.manager.focusWhenStarting"))
-                dlmgrWindow.focus();
-          }
-          else
-          {            
-              if(prefs.getBoolPref("browser.download.manager.showWhenStarting"))
-                openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
-          }
+  if(dlmgrWindow)
+  {
+    if(prefs.getBoolPref("browser.download.manager.focusWhenStarting"))
+      dlmgrWindow.focus();
+  }
+  else
+  {            
+    if(prefs.getBoolPref("browser.download.manager.showWhenStarting"))
+      openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
+  }
 
-          var activeDl = dm.activeDownloads;
-          while(activeDl.hasMoreElements())
-          {
-              var dl = activeDl.getNext().QueryInterface(Components.interfaces.nsIDownload);
-              if(dl.state==4)
-                  dm.resumeDownload(dl.id);
-          }
+  Downloads.getList().then(function (list){ list.getAll().then(function (downloads) {
 
-          var newDownloadArray = [];
 
-          for (var i=0; i<downloadArray.length; i++)
-          {
-              var scheduleSlot = downloadArray[i];
-              if((scheduleSlot == undefined) || (scheduleSlot==null))
-                  continue;
+  for(var i = 0; i++; i < downloads.length)
+  {
+    downloads[i].start().then();
+  }
 
-              var obj_Persist = Components.classes["@mozilla.org/embedding/browser/nsWebBrowserPersist;1"].createInstance(Components.interfaces.nsIWebBrowserPersist);
-              const nsIWBP = Components.interfaces.nsIWebBrowserPersist;
-              const flags = nsIWBP.PERSIST_FLAGS_REPLACE_EXISTING_FILES;
-              obj_Persist.persistFlags = flags | nsIWBP.PERSIST_FLAGS_FROM_CACHE;
 
-              var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-              targetFile.initWithPath(scheduleSlot.target);
-              if(!targetFile.exists())
-                targetFile.create(0x00,0644);
+  var newDownloadArray = [];
 
-              var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(scheduleSlot.source, null, null);
-              var targetURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newFileURI(targetFile);
+  for (var i=0; i < downloadArray.length; i++)
+  {
+    var scheduleSlot = downloadArray[i];
+    if((scheduleSlot == undefined) || (scheduleSlot==null))
+      continue;
 
-              var privacyContext = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-                  .getInterface(Components.interfaces.nsIWebNavigation)
-                  .QueryInterface(Components.interfaces.nsILoadContext);
-              
-              var download = dm.addDownload(0, sourceURI, targetURI,  null, null, null, null, obj_Persist, privacyContext);
+    //var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(scheduleSlot.source, null, null);
+    //var targetURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newFileURI(targetFile);
 
-              obj_Persist.progressListener = download;
+    var privacyContext = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
+      .getInterface(Components.interfaces.nsIWebNavigation)
+      .QueryInterface(Components.interfaces.nsILoadContext);
 
-              obj_Persist.saveURI(sourceURI, null, null, null, null, targetFile, privacyContext);
+    var downloadProps = {};
+    downloadProps.source = scheduleSlot.source;
+    downloadProps.target = scheduleSlot.target;
 
-              if(scheduleSlot.recurring)
-                newDownloadArray.push(scheduleSlot);
-          }
+    Downloads.createDownload( downloadProps ).then(function (newDl) { newDl.start(); } );
 
-          Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(newDownloadArray);
+    if(scheduleSlot.recurring)
+      newDownloadArray.push(scheduleSlot);
+  }
 
-          var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
-          if(scheduleWindow)
-              scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
+  Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(newDownloadArray);
 
-      } catch (e) {
-          alert(e);
-      }
-      
+  var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
+  if(scheduleWindow)
+    scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
+
+  }) });
+
+
   },
 
   pauseDownloads: function() {
       try {
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
           if(prefs.getBoolPref("dlScheduler.pauseEnabled"))
           {
             var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
@@ -296,28 +283,10 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       file: file
     };
 
-
-    var VersionComparator = Components.classes['@mozilla.org/xpcom/version-comparator;1'].getService(Components.interfaces.nsIVersionComparator);
-    var AppInfo = Components.classes['@mozilla.org/xre/app-info;1'].getService(Components.interfaces.nsIXULAppInfo);
-    const FIREFOX_ID = '{ec8030f7-c20a-464f-9b0e-13a3a9e97384}';
-    const THUNDERBIRD_ID = '{3550f703-e582-4d05-9a08-453d09bdfdc6}';
-    const SEAMONKEY_ID = '{92650c4d-4b8e-4d2a-b7eb-24ecf4f6b63a}';
-    const appId = AppInfo.ID;
-    const appVersion = AppInfo.version;
-    
-    var getTargetFileAsync = getTargetFile;     //This is because of a breaking change in 23
-    if (appId == FIREFOX_ID && VersionComparator.compare(appVersion, '23.0a1') < 0 ||
-        appId == SEAMONKEY_ID && VersionComparator.compare(appVersion, '2.20a1') < 0) {
-            getTargetFileAsync = function(aFpP, aCallback, aSkipPrompt, aRelatedURI) {
-            var dialogCancelled = getTargetFile(aFpP, aSkipPrompt, aRelatedURI) === false;
-            aCallback(dialogCancelled);
-        };
-    }
-
-    getTargetFileAsync(fpParams, function(aDialogCancelled) {
-        if (!aDialogCancelled)
+    promiseTargetFile(fpParams).then(aDialogAccepted => {
+        if (aDialogAccepted)
             aCallback(fpParams.file);
-    }, false );
+    });
 
   },
 
@@ -343,9 +312,9 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       // get a channel for that nsIURI
       var ch = ioService.newChannelFromURI(uri);
       ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
+      ch.redirectionLimit = 0;
 
-      var stream = Components.classes["@mozilla.org/scriptableinputstream;1"].createInstance(Components.interfaces.nsIScriptableInputStream);
-      stream.init(ch.open());
+      ch.open();
 
       try {
         headerLocation = ch.getResponseHeader("location")
@@ -354,8 +323,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         headerContentDisp = ch.getResponseHeader("content-disposition");
       } catch (ex) {}
 
-      stream.close;
       isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+      ch.cancel(Components.results.NS_BINDING_ABORTED);
 
     } while(isRedirect)
 
