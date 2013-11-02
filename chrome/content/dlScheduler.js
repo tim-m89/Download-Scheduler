@@ -193,13 +193,13 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
   }
 
-  Downloads.getList().then(function (list){ list.getAll().then(function (downloads) {
+  //Downloads.getList().then(function (list){ list.getAll().then(function (downloads) {
 
 
-  for(var i = 0; i++; i < downloads.length)
-  {
-    downloads[i].start().then();
-  }
+  //for(var i = 0; i++; i < downloads.length)
+  //{
+    //downloads[i].start().then();
+  //}
 
 
   var newDownloadArray = [];
@@ -233,7 +233,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   if(scheduleWindow)
     scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
 
-  }) });
+  //}) });
 
 
   },
