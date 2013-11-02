@@ -245,20 +245,23 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
       // get a channel for that nsIURI
       var ch = ioService.newChannelFromURI(uri);
-      ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
-      ch.redirectionLimit = 0;
-
-      ch.open();
-
       try {
-        headerLocation = ch.getResponseHeader("location")
-      } catch (ex) {}
-      try {
-        headerContentDisp = ch.getResponseHeader("content-disposition");
-      } catch (ex) {}
+        ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
+        ch.redirectionLimit = 0;
 
-      isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
-      ch.cancel(Components.results.NS_BINDING_ABORTED);
+        ch.open();
+
+        try {
+          headerLocation = ch.getResponseHeader("location")
+        } catch (ex) {}
+        try {
+          headerContentDisp = ch.getResponseHeader("content-disposition");
+        } catch (ex) {}
+
+        isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+        ch.cancel(Components.results.NS_BINDING_ABORTED);
+
+      } catch (ex) {}
 
     } while(isRedirect)
 
