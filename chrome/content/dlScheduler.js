@@ -179,28 +179,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
   var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
   Components.utils.import("resource://gre/modules/Downloads.jsm");
-  var dlmgrWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("Download:Manager");
-  var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-
-  if(dlmgrWindow)
-  {
-    if(prefs.getBoolPref("browser.download.manager.focusWhenStarting"))
-      dlmgrWindow.focus();
-  }
-  else
-  {            
-    if(prefs.getBoolPref("browser.download.manager.showWhenStarting"))
-      openDialog("chrome://mozapps/content/downloads/downloads.xul", "Download:Manager", "chrome,centerscreen", null);
-  }
-
-  //Downloads.getList().then(function (list){ list.getAll().then(function (downloads) {
-
-
-  //for(var i = 0; i++; i < downloads.length)
-  //{
-    //downloads[i].start().then();
-  //}
-
 
   var newDownloadArray = [];
 
@@ -210,9 +188,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     if((scheduleSlot == undefined) || (scheduleSlot==null))
       continue;
 
-    //var sourceURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newURI(scheduleSlot.source, null, null);
-    //var targetURI = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService).newFileURI(targetFile);
-
     var privacyContext = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
       .getInterface(Components.interfaces.nsIWebNavigation)
       .QueryInterface(Components.interfaces.nsILoadContext);
@@ -221,7 +196,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     downloadProps.source = scheduleSlot.source;
     downloadProps.target = scheduleSlot.target;
 
-    Downloads.createDownload( downloadProps ).then(function (newDl) { newDl.start(); } );
+    Downloads.createDownload( downloadProps ).then(function (newDl) { newDl.tryToKeepPartialData = true; newDl.start(); } );
 
     if(scheduleSlot.recurring)
       newDownloadArray.push(scheduleSlot);
@@ -233,7 +208,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   if(scheduleWindow)
     scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
 
-  //}) });
 
 
   },
