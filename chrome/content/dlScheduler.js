@@ -166,21 +166,23 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   var newDownloadArray = [];
 
+  Downloads.getList(Downloads.ALL).then(downloadsList => {
+
   for (var i=0; i < downloadArray.length; i++)
   {
     var scheduleSlot = downloadArray[i];
     if((scheduleSlot == undefined) || (scheduleSlot==null))
       continue;
 
-    var privacyContext = window.QueryInterface(Components.interfaces.nsIInterfaceRequestor)
-      .getInterface(Components.interfaces.nsIWebNavigation)
-      .QueryInterface(Components.interfaces.nsILoadContext);
-
     var downloadProps = {};
     downloadProps.source = scheduleSlot.source;
     downloadProps.target = scheduleSlot.target;
 
-    Downloads.createDownload( downloadProps ).then(function (newDl) { newDl.tryToKeepPartialData = true; newDl.start(); } );
+
+    Downloads.createDownload( downloadProps ).then(newDl => {
+        newDl.start().then();
+        downloadsList.add(newDl).then();
+    } );
 
     if(scheduleSlot.recurring)
       newDownloadArray.push(scheduleSlot);
@@ -191,6 +193,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
   if(scheduleWindow)
     scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
+
+  } );
 
 
 
