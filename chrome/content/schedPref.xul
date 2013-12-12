@@ -5,32 +5,19 @@
     id="tim_matthews.downloadScheduler.schedPrefWindow"
     title="&DownloadSchedulerOptions;"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    onload="tim_matthews.downloadScheduler.schedPref_js.prefLoad();">
+    onload="tim_matthews.downloadScheduler.schedPref_js.prefLoad();"
+    width="200"
+    height="150">
     <prefpane label="General">
         <preferences>
             <preference id="tim_matthews.downloadScheduler.prefWin.startTime" name="dlScheduler.startTime" type="string"/>
             <preference id="tim_matthews.downloadScheduler.prefWin.finishTime" name="dlScheduler.finishTime" type="string"/>       
             <preference id="tim_matthews.downloadScheduler.prefWin.pauseEnabled" name="dlScheduler.pauseEnabled" type="bool"/>       
         </preferences>
-        <grid width="200">
-            <columns>
-                <column flex="1"/>
-                <column flex="2"/>
-            </columns>
-            <rows>
-                <row>
-                    <groupbox>
-                      <caption label="&StartTime;" />
-                      <timepicker id="tim_matthews.downloadScheduler.prefWin.tp1" hideseconds="true" preference="tim_matthews.downloadScheduler.prefWin.startTime" />
-                    </groupbox>
-                    <groupbox>
-                      <caption label="&PauseTime;" />
-                      <checkbox id="tim_matthews.downloadScheduler.prefWin.cbPauseEnabled" label="&Enabled;" preference="tim_matthews.downloadScheduler.prefWin.pauseEnabled" />
-                      <timepicker id="tim_matthews.downloadScheduler.prefWin.tp2" hideseconds="true" preference="tim_matthews.downloadScheduler.prefWin.finishTime" />
-                    </groupbox>
-                </row>
-            </rows>
-        </grid>
+        <groupbox align="center">
+          <caption label="&StartTime;" />
+          <timepicker flex="1" id="tim_matthews.downloadScheduler.prefWin.tp1" hideseconds="true" preference="tim_matthews.downloadScheduler.prefWin.startTime" />
+        </groupbox>
     </prefpane>
     <script src="schedPref.js"></script>
 </prefwindow>

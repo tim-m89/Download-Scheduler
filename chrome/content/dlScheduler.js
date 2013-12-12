@@ -17,15 +17,10 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   timer: {
     startTimer: null,
-    finishTimer: null,
     cancel: function() {
       if(this.startTimer) {
           this.startTimer.cancel();
           this.startTimer = null;
-      }
-      if(this.finishTimer) {
-          this.finishTimer.cancel();
-          this.finishTimer = null;
       }
     },
     setupTimer: function() {
@@ -33,7 +28,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
         var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
         var startHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.startTime"));
-        var finishHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.finishTime"));
 
         /* Set the next start time from today */
         
@@ -47,21 +41,11 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         if(startDate.getTime() < now.getTime())
             startDate.setTime(startDate.getTime() + 86400000);
         
-        var finDate = new Date();
-        finDate.setHours(finishHM.hours);
-        finDate.setMinutes(finishHM.mins);
-        finDate.setSeconds(0);
-        if(finDate.getTime() < startDate.getTime())
-            finDate.setTime(finDate.getTime() + 86400000);
-
         var msStart = startDate.getTime() - now.getTime();
-        var msFin = finDate.getTime() - now.getTime();
 
         this.startTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
         this.startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownloads(); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
 
-        this.finishTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-        this.finishTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.pauseDownloads(); } }, msFin, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
     },
     observe: function(subject, topic, data) {
         if (topic != "nsPref:changed")
@@ -211,30 +195,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
 
   },
-
-  pauseDownloads: function() {
-      try {
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-          if(prefs.getBoolPref("dlScheduler.pauseEnabled"))
-          {
-            var dm = Components.classes["@mozilla.org/download-manager;1"].getService(Components.interfaces.nsIDownloadManager);
-            var activeDl = dm.activeDownloads;
-            while(activeDl.hasMoreElements())
-            {
-                var dl = activeDl.getNext().QueryInterface(Components.interfaces.nsIDownload);
-                if(dl.state==0)
-                    dm.pauseDownload(dl.id);
-            }
-          }
-
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
-
-      } catch (e) {
-          alert(e);
-      }
-  },
-
-
 
   getFileName: function(aURL, aContentDisposition, aCallback) {
 
