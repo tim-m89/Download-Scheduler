@@ -15,42 +15,34 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   },
 
 
-  timer: {
-    startTimer: null,
-    cancel: function() {
-      if(this.startTimer) {
-          this.startTimer.cancel();
-          this.startTimer = null;
-      }
-    },
-    setupTimer: function() {
-        this.cancel();
-
-        var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-        var startHM = tim_matthews.downloadScheduler.dlScheduler_js.hmFromTimeString(prefs.getCharPref("dlScheduler.startTime"));
-
-        /* Set the next start time from today */
-        
+  timerCtrl: {
+    startTimers: [],
+    setupTimer: function(scheduleSlot) {
         var now = new Date();
-
         var startDate = new Date();
-        startDate.setHours(startHM.hours);
-        startDate.setMinutes(startHM.mins);
+        startDate.setHours(scheduleSlot.dateStart.getHours());
+        startDate.setMinutes(scheduleSlot.dateStart.getMinutes());
         startDate.setSeconds(0);
         /* If we've missed today's schedule, set time at tommorows date */
         if(startDate.getTime() < now.getTime())
-            startDate.setTime(startDate.getTime() + 86400000);
-        
+          startDate.setTime(startDate.getTime() + 86400000);
         var msStart = startDate.getTime() - now.getTime();
-
-        this.startTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-        this.startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownloads(); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
-
+        var startTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
+        startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownload(scheduleSlot, timerr); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+        return startTimer;
+    },
+    setupTimers: function() {
+      while(this.startTimers.length > 0 ) {
+        var timer = this.startTimers.pop();
+        timer.cancel();
+      }
+      var da = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
+      for(var i = 0; (i < da.length) ; i++) {
+        var scheduleSlot = da[i];
+        this.startTimers.push(this.setupTimer(scheduleSlot));
+      }
     },
     observe: function(subject, topic, data) {
-        if (topic != "nsPref:changed")
-            return;
-        this.setupTimer();
     }
   },
 
@@ -69,23 +61,38 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               contextMenu.addEventListener("popupshowing", tim_matthews.downloadScheduler.dlScheduler_js.thumbnailsShowHideItems, false);
 
 
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.setupTimer();
+          tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
 
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
-          prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timer, false);
-          tim_matthews.downloadScheduler.dlScheduler_js.timer.prefs = prefs;
+          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
+          prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl, false);
+          tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.prefs = prefs;
           
           var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication); 
           Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
+            da: null,
             get: function() {
-              return JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data);
+              if(!this.da) {
+                this.da = JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data, function(k,v) {
+                  if((k == "dateStart") || (k == "dateInterval"))
+                    return new Date(v);
+                  return v; }
+                );
+              }
+              return this.da;
             },
             set: function(arr) {
               var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
               str.data = JSON.stringify(arr);
               prefs.setComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
+              this.da = arr;
+
+              tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
+
+              var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
+              if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
+                scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
             },
-            addOne: function(remote, local, recurring) {
+            addOne: function(remote, local, recurring, dateStart, dateInterval) {
               var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
               targetFile.initWithPath(local);
 
@@ -98,13 +105,12 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               scheduleSlot.source = remote;
               scheduleSlot.target = local;
               scheduleSlot.recurring = recurring;
+              scheduleSlot.dateStart = dateStart;
+              scheduleSlot.dateInterval = dateInterval;
               downloadArray.push(scheduleSlot);
 
               this.set(downloadArray);
 
-              var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
-              if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
-                scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
             },
             parseURL: function(url) {
               var fileName = {};
@@ -127,9 +133,23 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               }
               return fileName;
             },
+            removeSlot: function(slot) {
+              var da = this.get();
+              var i = da.indexOf(slot);
+              if(i < 0)
+                return;
+              da.splice(i, 1);
+              this.set(da);
+            },
+            updateSlot: function(oldSlot, newSlot) {
+              var da = this.get();
+              var i = da.indexOf(oldSlot);
+              if(i < 0)
+                return;
+              da.splice(i, 1, newSlot);
+              this.set(da);
+            }
           });
-
-          Application.storage.set("tim_matthews.downloadScheduler.timer", tim_matthews.downloadScheduler.dlScheduler_js.timer);
 
           /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
           var oldIP = internalPersist;
@@ -146,7 +166,15 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               else if(button==1)
                 return;
               else if(button==2)
-                Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(persistArgs.sourceURI.resolve(""), persistArgs.targetFile.path, false);
+                var args = {};
+                args.date = new Date();
+                args.saved = false;
+                window.openDialog("chrome://dlScheduler/content/timeChooseWin.xul", "tim_matthews.downloadScheduler.timeChooseWin", "chrome=yes, width=360, height=220, resizable=yes, modal=yes", args).focus();
+                if(!args.saved)
+                  return;
+                var source = persistArgs.sourceURI.spec;
+                Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source , persistArgs.targetFile.path, false, args.date, null);
+
             }
         };
       } catch (e) {
@@ -155,40 +183,45 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   },
  
   showScheduler: function() {
-      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=220, resizable=yes" ).focus();
+      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=320, resizable=yes" ).focus();
   },
 
-  startDownloads: function() {
+  startDownload: function(scheduleSlot) {
 
   var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
   var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
   Components.utils.import("resource://gre/modules/Downloads.jsm");
 
-  var newDownloadArray = [];
-
   Downloads.getList(Downloads.ALL).then(downloadsList => {
 
-  for (var i=0; i < downloadArray.length; i++)
-  {
-    var scheduleSlot = downloadArray[i];
-    if((scheduleSlot == undefined) || (scheduleSlot==null))
-      continue;
-
-    var downloadProps = {};
-    downloadProps.source = scheduleSlot.source;
-    downloadProps.target = scheduleSlot.target;
+  var downloadProps = {};
+  downloadProps.source = scheduleSlot.source;
+  downloadProps.target = scheduleSlot.target;
 
 
-    Downloads.createDownload( downloadProps ).then(newDl => {
-        newDl.start().then();
-        downloadsList.add(newDl).then();
-    } );
+  Downloads.createDownload( downloadProps ).then(newDl => {
+      newDl.start().then();
+      downloadsList.add(newDl).then();
+  } );
 
-    if(scheduleSlot.recurring)
-      newDownloadArray.push(scheduleSlot);
+  if(scheduleSlot.recurring) {
+      /* create a new slot and advance the time */
+      var newSlot = {};
+      newSlot.dateStart = new Date();
+      newSlot.dateStart.setTime(
+      (scheduleSlot.dateInterval.getHours() * 3600000) +
+      (scheduleSlot.dateInterval.getMinutes() * 60000) +
+      (scheduleSlot.dateStart.getTime() ) );
+      newSlot.source = scheduleSlot.source;
+      newSlot.target = scheduleSlot.target;
+      newSlot.recurring = true;
+      newSlot.dateInterval = scheduleSlot.dateInterval;
+
+      Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).updateSlot(scheduleSlot, newSlot);
   }
-
-  Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).set(newDownloadArray);
+  else {
+    Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).removeSlot(scheduleSlot);
+  }
 
   var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
   if(scheduleWindow)
@@ -280,7 +313,16 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
       if( fileName == null)
         return;
-    
+
+      var args = {};
+      args.date = new Date();
+      args.saved = false;
+      
+
+      window.openDialog("chrome://dlScheduler/content/timeChooseWin.xul", "tim_matthews.downloadScheduler.timeChooseWin", "chrome=yes, width=360, height=420, resizable=yes, modal=yes", args).focus();
+
+      if(!args.saved)
+        return;
 
       var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
       targetFile.initWithFile(fileName);
@@ -289,7 +331,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       targetFile.create(0x00,0644);
 
 
-      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName.path, false);
+    Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName, false, args.date, null);
+
 
     });
   },

@@ -4,21 +4,29 @@ if(!tim_matthews.downloadScheduler.editWin_js) tim_matthews.downloadScheduler.ed
 
 tim_matthews.downloadScheduler.editWin_js = {
 
+  slot: null,
+
   loadDownload: function() {
-    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
     var index = window.arguments[0];
     if(index>=0) {
       var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-      var scheduleSlot = downloadArray[index];
-      document.getElementById("tim_matthews.downloadScheduler.editWin.source").value = scheduleSlot.source;
-      document.getElementById("tim_matthews.downloadScheduler.editWin.target").value = scheduleSlot.target;
-      document.getElementById("tim_matthews.downloadScheduler.editWin.recurring").checked = scheduleSlot.recurring; 
+      this.slot = downloadArray[index];
+      document.getElementById("tim_matthews.downloadScheduler.editWin.source").value = this.slot.source;
+      document.getElementById("tim_matthews.downloadScheduler.editWin.target").value = this.slot.target;
+      var radioRec = document.getElementById("tim_matthews.downloadScheduler.editWin.radioRecurring");
+      var radioOne = document.getElementById("tim_matthews.downloadScheduler.editWin.radioOneTime");
+      var groupFreq =  document.getElementById("tim_matthews.downloadScheduler.editWin.groupFreq");
+      if(this.slot.recurring)
+        groupFreq.selectedItem = radioRec;
+      else
+        groupFreq.selectedItem = radioOne;
+      var timePicker1 = document.getElementById("tim_matthews.downloadScheduler.editWin.timepick");
+      timePicker1.dateValue = new Date(this.slot.dateStart.getTime()); 
     }
   },
 
   chooseFile: function() {
     try {
-    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
     var nsIFilePicker = Components.interfaces.nsIFilePicker;
     var fp = Components.classes["@mozilla.org/filepicker;1"].createInstance(nsIFilePicker);
     fp.init(window, "Enter name of file for scheduled download...", nsIFilePicker.modeSave);
@@ -44,20 +52,22 @@ tim_matthews.downloadScheduler.editWin_js = {
 
   save: function() {
     var index = window.arguments[0];
-    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
+    var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
+    var newSlot = {};
+    newSlot.source = document.getElementById("tim_matthews.downloadScheduler.editWin.source").value;
+    newSlot.target = document.getElementById("tim_matthews.downloadScheduler.editWin.target").value;
+    newSlot.recurring = document.getElementById("tim_matthews.downloadScheduler.editWin.radioRecurring").selected;
+    newSlot.dateStart = document.getElementById("tim_matthews.downloadScheduler.editWin.timepick").dateValue; 
+    var hours = document.getElementById("tim_matthews.downloadScheduler.editWin.textboxH").value;
+    var mins = document.getElementById("tim_matthews.downloadScheduler.editWin.textboxM").value;
+    newSlot.dateInterval = new Date();
+    newSlot.dateInterval.setHours(parseInt(hours));
+    newSlot.dateInterval.setMinutes(parseInt(mins));
     if(index>=0) {
-      var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-      var scheduleSlot = downloadArray[index];
-      scheduleSlot.source = document.getElementById("tim_matthews.downloadScheduler.editWin.source").value;
-      scheduleSlot.target = document.getElementById("tim_matthews.downloadScheduler.editWin.target").value;
-      scheduleSlot.recurring = document.getElementById("tim_matthews.downloadScheduler.editWin.recurring").checked;
-      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).set(downloadArray);
+      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).updateSlot(this.slot, newSlot);
     } else {
-      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(
-              document.getElementById("tim_matthews.downloadScheduler.editWin.source").value,
-              document.getElementById("tim_matthews.downloadScheduler.editWin.target").value,
-              document.getElementById("tim_matthews.downloadScheduler.editWin.recurring").checked)
-    } 
+      Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(newSlot.source, newSlot.target, newSlot.recurring, newSlot.dateStart, newSlot.dateInterval);
+    }
     window.close();
   }
 
