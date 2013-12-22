@@ -28,7 +28,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
           startDate.setTime(startDate.getTime() + 86400000);
         var msStart = startDate.getTime() - now.getTime();
         var startTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
-        startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownload(scheduleSlot, timerr); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
+        startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownload(scheduleSlot); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
         return startTimer;
     },
     setupTimers: function() {
@@ -36,10 +36,15 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         var timer = this.startTimers.pop();
         timer.cancel();
       }
-      var da = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
-      for(var i = 0; (i < da.length) ; i++) {
-        var scheduleSlot = da[i];
-        this.startTimers.push(this.setupTimer(scheduleSlot));
+      var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
+      var da = null;
+      if(dlCtrl != null)
+        da = dlCtrl.get();
+      if(da != null) {
+        for(var i = 0; (i < da.length) ; i++) {
+          var scheduleSlot = da[i];
+          this.startTimers.push(this.setupTimer(scheduleSlot));
+        }
       }
     },
     observe: function(subject, topic, data) {
@@ -254,8 +259,8 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       file: file
     };
 
-    promiseTargetFile(fpParams).then(aDialogAccepted => {
-        if (aDialogAccepted)
+    getTargetFile(fpParams, aDialogCancelled => {
+        if (!aDialogCancelled)
             aCallback(fpParams.file);
     });
 
@@ -340,5 +345,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 };
 
 window.addEventListener("load", tim_matthews.downloadScheduler.dlScheduler_js.init, false);
+
 
 
