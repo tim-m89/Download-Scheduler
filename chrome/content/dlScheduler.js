@@ -51,7 +51,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       da: null,
       getDownloads: function() {
         if(!this.da) {
-          this.da = JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data, function(k,v) {
+          this.da = JSON.parse(prefs.getComplexValue("extensions.tim_matthews.dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data, function(k,v) {
             if((k == "dateStart") || (k == "dateInterval"))
               return new Date(v);
             return v; }
@@ -62,7 +62,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       setDownloads: function(arr) {
         var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
         str.data = JSON.stringify(arr);
-        prefs.setComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
+        prefs.setComplexValue("extensions.tim_matthews.dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
         this.da = arr;
 
         tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
