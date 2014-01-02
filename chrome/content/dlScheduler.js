@@ -71,7 +71,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
           scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
       },
-      addOne: function(remote, local, dateStart, recurring, dateInterval) {
+      addOne: function(remote, local, dateStart) {
         var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
         targetFile.initWithPath(local);
 
@@ -84,14 +84,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         scheduleSlot.source = remote;
         scheduleSlot.target = local;
         scheduleSlot.dateStart = dateStart;
-        if(recurring === undefined) {
-          scheduleSlot.recurring = false;
-          scheduleSlot.dateInterval = null;
-        }
-        else {
-          scheduleSlot.recurring = recurring;
-          scheduleSlot.dateInterval = dateInterval;
-        }
+
         downloadArray.push(scheduleSlot);
 
         this.setDownloads(downloadArray);
@@ -202,9 +195,10 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   startDownload: function(scheduleSlot) {
 
-  var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
-  var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null).getDownloads();
   Components.utils.import("resource://gre/modules/Downloads.jsm");
+
+  var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
+  var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null);
 
   Downloads.getList(Downloads.ALL).then(downloadsList => {
 
@@ -212,30 +206,12 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   downloadProps.source = scheduleSlot.source;
   downloadProps.target = scheduleSlot.target;
 
-
   Downloads.createDownload( downloadProps ).then(newDl => {
       newDl.start().then();
       downloadsList.add(newDl).then();
   } );
 
-  if(scheduleSlot.recurring) {
-      /* create a new slot and advance the time */
-      var newSlot = {};
-      newSlot.dateStart = new Date();
-      newSlot.dateStart.setTime(
-      (scheduleSlot.dateInterval.getHours() * 3600000) +
-      (scheduleSlot.dateInterval.getMinutes() * 60000) +
-      (scheduleSlot.dateStart.getTime() ) );
-      newSlot.source = scheduleSlot.source;
-      newSlot.target = scheduleSlot.target;
-      newSlot.recurring = true;
-      newSlot.dateInterval = scheduleSlot.dateInterval;
-
-      Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl", null).updateSlot(scheduleSlot, newSlot);
-  }
-  else {
-    Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl", null).removeSlot(scheduleSlot);
-  }
+  dlCtrl.removeSlot(scheduleSlot);
 
   var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
   if(scheduleWindow)
