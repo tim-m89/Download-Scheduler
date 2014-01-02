@@ -54,6 +54,7 @@ tim_matthews.downloadScheduler.editWin_js = {
     var timeDate = document.getElementById("tim_matthews.downloadScheduler.editWin.timepick").dateValue;
     newSlot.dateStart.setHours(timeDate.getHours());
     newSlot.dateStart.setMinutes(timeDate.getMinutes());
+    newSlot.dateStart.setSeconds(0);
 
     if(index>=0) {
       Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null).updateSlot(this.slot, newSlot);
