@@ -17,4 +17,7 @@
 <!ENTITY Recurring "Ricorrenti">
 <!ENTITY RecurringToolTip "Quando è selezionato, voce rimane nella lista di programma all'avvio di download per la prossima volta.">
 <!ENTITY DateTime "Data / Ora">
+<!ENTITY Save "Salva">
+<!ENTITY Cancel "Annulla">
+
 

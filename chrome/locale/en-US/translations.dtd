@@ -17,3 +17,5 @@
 <!ENTITY Recurring "Recurring">
 <!ENTITY RecurringToolTip "When selected, item remains in the schedule list upon download start for next time.">
 <!ENTITY DateTime "Date / Time">
+<!ENTITY Save "Save">
+<!ENTITY Cancel "Cancel">

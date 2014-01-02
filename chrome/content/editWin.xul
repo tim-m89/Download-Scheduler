@@ -36,8 +36,8 @@
       <spacer flex="1"/>
       <hbox>
         <spacer flex="1"/>
-        <button  height="30" width="100" label="Save" oncommand="tim_matthews.downloadScheduler.editWin_js.save();"/>
-        <button height="30" width="100" label="Cancel" onclick="window.close();"/>
+        <button height="30" width="100" label="&Save;" oncommand="tim_matthews.downloadScheduler.editWin_js.save();"/>
+        <button height="30" width="100" label="&Cancel;" onclick="window.close();"/>
       </hbox>
   </vbox>
 </window>

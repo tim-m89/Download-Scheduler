@@ -17,3 +17,6 @@
 <!ENTITY Recurring "Recurrente">
 <!ENTITY RecurringToolTip "Cuando se selecciona, el tema permanece en la lista de programación en el arranque de descarga para la próxima vez.">
 <!ENTITY DateTime "Fecha / Hora">
+<!ENTITY Save "Guardar">
+<!ENTITY Cancel "Cancelar">
+

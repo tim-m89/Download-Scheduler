@@ -17,4 +17,7 @@
 <!ENTITY Recurring "Recurrente">
 <!ENTITY RecurringToolTip "Indien geselecteerd, item blijft in de planning lijst bij het downloaden te beginnen voor de volgende keer.">
 <!ENTITY DateTime "Datum / tijd">
+<!ENTITY Save "Besparen">
+<!ENTITY Cancel "Annuleren">
+
 
