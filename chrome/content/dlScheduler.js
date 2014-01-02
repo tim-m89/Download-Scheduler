@@ -115,8 +115,12 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       },
       urlChooseFile: function(aUrl, aCallback) {
 
+        var fileNameSource = null;
+
+        try {
+
         var headerLocation = null;
-        var headerContentDisp = null
+        var headerContentDisp = null;
 
         var isRedirect = false;
 
@@ -149,12 +153,13 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
         } while(isRedirect)
 
-        var fileNameSource;
 
         if( headerLocation != null)
           fileNameSource = headerLocation;
         else
           fileNameSource = aUrl;
+
+        } catch (ex) {}
 
         tim_matthews.downloadScheduler.dlScheduler_js.getFileNameInternal(fileNameSource, headerContentDisp, function(fileName) {
           aCallback(fileName);
