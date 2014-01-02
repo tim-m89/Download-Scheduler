@@ -4,7 +4,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>dlScheduler@ext.net</em:id>
-    <em:version>2</em:version>
+    <em:version>2.0</em:version>
     <em:type>2</em:type>
     <em:targetApplication>
       <Description>
@@ -18,7 +18,6 @@
     <em:description>Same firefox downloader. You choose the schedule.</em:description>
     <em:creator>Tim Matthews</em:creator>
     <em:homepageURL>http://sites.google.com/site/downloadscheduler/</em:homepageURL>
-    <em:optionsURL>chrome://dlScheduler/content/schedPref.xul</em:optionsURL>
     </Description>      
 </RDF>
 
