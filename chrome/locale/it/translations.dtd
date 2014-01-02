@@ -16,3 +16,5 @@
 <!ENTITY ChooseTargetFile "Scegli il file di destinazione">
 <!ENTITY Recurring "Ricorrenti">
 <!ENTITY RecurringToolTip "Quando è selezionato, voce rimane nella lista di programma all'avvio di download per la prossima volta.">
+<!ENTITY DateTime "Data / Ora">
+

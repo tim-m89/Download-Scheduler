@@ -16,3 +16,5 @@
 <!ENTITY ChooseTargetFile "Välj målfil">
 <!ENTITY Recurring "Återkommande">
 <!ENTITY RecurringToolTip "När du väljer förblir objekt i listan Planera vid nedladdning start för nästa gång.">
+<!ENTITY DateTime "Datum / Tid">
+

@@ -12,7 +12,8 @@
 <!ENTITY Enabled "Enabled">
 <!ENTITY AddEdit "Add / Edit">
 <!ENTITY TargetFileToolTip "Destination File. Double Click to open file chooser.">
-<!ENTITY EnterSourceURL "Enter source URL">
-<!ENTITY ChooseTargetFile "Choose target file">
+<!ENTITY EnterSourceURL "Source URL">
+<!ENTITY ChooseTargetFile "Target file">
 <!ENTITY Recurring "Recurring">
 <!ENTITY RecurringToolTip "When selected, item remains in the schedule list upon download start for next time.">
+<!ENTITY DateTime "Date / Time">

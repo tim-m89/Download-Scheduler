@@ -9,26 +9,35 @@
     onload="tim_matthews.downloadScheduler.editWin_js.loadDownload();"
     onunload="">
     <script src="editWin.js"></script>
-    <vbox>
+    <vbox flex="1">
+      <grid>
+        <columns>
+          <column flex="1"/>
+          <column flex="2"/>
+        </columns>
+        <rows>
+          <row align="baseline">
+            <label control="tim_matthews.downloadScheduler.editWin.source" value="&EnterSourceURL;"/>
+            <textbox id="tim_matthews.downloadScheduler.editWin.source" value="http://" />
+          </row>
+          <row align="baseline">
+            <label control="tim_matthews.downloadScheduler.editWin.target" value="&ChooseTargetFile;"/>
+            <textbox id="tim_matthews.downloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="tim_matthews.downloadScheduler.editWin_js.chooseFile();"/>
+          </row>
+          <row align="baseline">
+            <label value="&DateTime;"/>
+            <hbox align="center">
+              <datepicker id="tim_matthews.downloadScheduler.editWin.datepick" type="popup"/>
+              <timepicker id="tim_matthews.downloadScheduler.editWin.timepick" hideseconds="true"/>
+            </hbox>
+          </row>
+        </rows>
+      </grid>
+      <box flex="1"/>
       <hbox>
-        <label control="tim_matthews.downloadScheduler.editWin.source" value="&EnterSourceURL;" />
-        <label control="tim_matthews.downloadScheduler.editWin.target" value="&ChooseTargetFile;" />
+        <box flex="1"/>
+        <button  height="30" width="100" label="Save" oncommand="tim_matthews.downloadScheduler.editWin_js.save();"/>
       </hbox>
-      <hbox>
-        <textbox id="tim_matthews.downloadScheduler.editWin.source" value="http://" />
-        <textbox id="tim_matthews.downloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="tim_matthews.downloadScheduler.editWin_js.chooseFile();" />
-      </hbox>
-      <timepicker id="tim_matthews.downloadScheduler.editWin.timepick" hideseconds="true" />
-      <groupbox>
-        <caption label="Download Frequency" />
-        <radiogroup id="tim_matthews.downloadScheduler.editWin.groupFreq">
-          <radio id="tim_matthews.downloadScheduler.editWin.radioOneTime" label="One time only" />
-          <radio id="tim_matthews.downloadScheduler.editWin.radioRecurring" label="&Recurring;" tooltiptext="&RecurringToolTip;" selected="true" />
-          <textbox id="tim_matthews.downloadScheduler.editWin.textboxH" type="number" tooltiptext="&RecurringToolTip;" />
-          <textbox id="tim_matthews.downloadScheduler.editWin.textboxM" type="number" max="59" tooltiptext="&RecurringToolTip;" />
-        </radiogroup>
-      </groupbox>
-      <button height="30" width="100" label="Save" oncommand="tim_matthews.downloadScheduler.editWin_js.save();" />
-    </vbox>
+  </vbox>
 </window>
 

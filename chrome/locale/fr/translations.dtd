@@ -16,3 +16,4 @@
 <!ENTITY ChooseTargetFile "Choisissez le fichier cible">
 <!ENTITY Recurring "Récurrents">
 <!ENTITY RecurringToolTip "Lorsqu'elle est sélectionnée, élément reste dans la liste de programmation lors du démarrage de téléchargement pour la prochaine fois.">
+<!ENTITY DateTime "Date / Heure">

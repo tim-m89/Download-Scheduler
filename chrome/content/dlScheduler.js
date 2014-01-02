@@ -5,27 +5,11 @@ if(!tim_matthews.downloadScheduler.dlScheduler_js) tim_matthews.downloadSchedule
 
 tim_matthews.downloadScheduler.dlScheduler_js = {
 
-  hmFromTimeString: function(timeString) {
-      var s = timeString.split(":");
-      var obj = {};
-      obj.hours = parseInt(s[0]);
-      obj.mins = parseInt(s[1]);
-      
-      return obj;
-  },
-
-
   timerCtrl: {
     startTimers: [],
     setupTimer: function(scheduleSlot) {
         var now = new Date();
-        var startDate = new Date();
-        startDate.setHours(scheduleSlot.dateStart.getHours());
-        startDate.setMinutes(scheduleSlot.dateStart.getMinutes());
-        startDate.setSeconds(0);
-        /* If we've missed today's schedule, set time at tommorows date */
-        if(startDate.getTime() < now.getTime())
-          startDate.setTime(startDate.getTime() + 86400000);
+        var startDate = scheduleSlot.dateStart;
         var msStart = startDate.getTime() - now.getTime();
         var startTimer = Components.classes["@mozilla.org/timer;1"].createInstance(Components.interfaces.nsITimer);
         startTimer.initWithCallback({ notify: function(timerr) { tim_matthews.downloadScheduler.dlScheduler_js.startDownload(scheduleSlot); } }, msStart, Components.interfaces.nsITimer.TYPE_ONE_SHOT);
@@ -36,10 +20,10 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         var timer = this.startTimers.pop();
         timer.cancel();
       }
-      var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null);
+      var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null);
       var da = null;
       if(dlCtrl != null)
-        da = dlCtrl.get();
+        da = dlCtrl.getDownloads();
       if(da != null) {
         for(var i = 0; (i < da.length) ; i++) {
           var scheduleSlot = da[i];
@@ -47,8 +31,6 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
         }
       }
     },
-    observe: function(subject, topic, data) {
-    }
   },
 
   thumbnailsShowHideItems: function(event) {
@@ -59,102 +41,130 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
   },
 
   init: function() {
-      try {
-          var contextMenu = document.getElementById("contentAreaContextMenu");
+    var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication); 
+    var contextMenu = document.getElementById("contentAreaContextMenu");
+    if (contextMenu)
+        contextMenu.addEventListener("popupshowing", tim_matthews.downloadScheduler.dlScheduler_js.thumbnailsShowHideItems, false);
+    var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
 
-          if (contextMenu)
-              contextMenu.addEventListener("popupshowing", tim_matthews.downloadScheduler.dlScheduler_js.thumbnailsShowHideItems, false);
+    var downloadCtrl = {
+      da: null,
+      getDownloads: function() {
+        if(!this.da) {
+          this.da = JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data, function(k,v) {
+            if((k == "dateStart") || (k == "dateInterval"))
+              return new Date(v);
+            return v; }
+          );
+        }
+        return this.da;
+      },
+      setDownloads: function(arr) {
+        var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
+        str.data = JSON.stringify(arr);
+        prefs.setComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
+        this.da = arr;
 
+        tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
 
-          tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
+        var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
+        if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
+          scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
+      },
+      addOne: function(remote, local, dateStart, recurring, dateInterval) {
+        var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
+        targetFile.initWithPath(local);
 
-          var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch2);
-          prefs.addObserver("", tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl, false);
-          tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.prefs = prefs;
-          
-          var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication); 
-          Application.storage.set("tim_matthews.downloadScheduler.downloadArray",  {
-            da: null,
-            get: function() {
-              if(!this.da) {
-                this.da = JSON.parse(prefs.getComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString).data, function(k,v) {
-                  if((k == "dateStart") || (k == "dateInterval"))
-                    return new Date(v);
-                  return v; }
-                );
-              }
-              return this.da;
-            },
-            set: function(arr) {
-              var str = Components.classes["@mozilla.org/supports-string;1"].createInstance(Components.interfaces.nsISupportsString);
-              str.data = JSON.stringify(arr);
-              prefs.setComplexValue("dlScheduler.dlScheduleList", Components.interfaces.nsISupportsString, str)
-              this.da = arr;
+        if(!targetFile.exists())
+          targetFile.create(0x00,0644);
 
-              tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
+        var downloadArray = this.getDownloads();
 
-              var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
-              if((scheduleWindow) && (scheduleWindow.tim_matthews.downloadScheduler.schedWin_js))
-                scheduleWindow.tim_matthews.downloadScheduler.schedWin_js.refreshList();
-            },
-            addOne: function(remote, local, recurring, dateStart, dateInterval) {
-              var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-              targetFile.initWithPath(local);
+        var scheduleSlot = {};
+        scheduleSlot.source = remote;
+        scheduleSlot.target = local;
+        scheduleSlot.dateStart = dateStart;
+        if(recurring === undefined) {
+          scheduleSlot.recurring = false;
+          scheduleSlot.dateInterval = null;
+        }
+        else {
+          scheduleSlot.recurring = recurring;
+          scheduleSlot.dateInterval = dateInterval;
+        }
+        downloadArray.push(scheduleSlot);
 
-              if(!targetFile.exists())
-                targetFile.create(0x00,0644);
+        this.setDownloads(downloadArray);
 
-              var downloadArray = this.get();
+      },
+      removeSlot: function(slot) {
+        var da = this.getDownloads();
+        var i = da.indexOf(slot);
+        if(i < 0)
+          return;
+        da.splice(i, 1);
+        this.setDownloads(da);
+      },
+      updateSlot: function(oldSlot, newSlot) {
+        var da = this.getDownloads();
+        var i = da.indexOf(oldSlot);
+        if(i < 0)
+          return;
+        da.splice(i, 1, newSlot);
+        this.setDownloads(da);
+      },
+      urlChooseFile: function(aUrl, aCallback) {
 
-              var scheduleSlot = {};
-              scheduleSlot.source = remote;
-              scheduleSlot.target = local;
-              scheduleSlot.recurring = recurring;
-              scheduleSlot.dateStart = dateStart;
-              scheduleSlot.dateInterval = dateInterval;
-              downloadArray.push(scheduleSlot);
+        var headerLocation = null;
+        var headerContentDisp = null
 
-              this.set(downloadArray);
+        var isRedirect = false;
 
-            },
-            parseURL: function(url) {
-              var fileName = {};
-              fileName.file = "";
-              fileName.ext = "";
-              var slash = url.split("/");
-              if(slash.length > 0)
-              {
-                var file = slash[slash.length-1];
-                if( (file.length > 0) && (file.indexOf("?") == -1) )
-                {
-                  var dot = file.split(".");
-                  if(dot.length > 0)
-                  {
-                    var ext = dot[dot.length-1];
-                    fileName.file = file;
-                    fileName.ext = ext;
-                  }
-                }
-              }
-              return fileName;
-            },
-            removeSlot: function(slot) {
-              var da = this.get();
-              var i = da.indexOf(slot);
-              if(i < 0)
-                return;
-              da.splice(i, 1);
-              this.set(da);
-            },
-            updateSlot: function(oldSlot, newSlot) {
-              var da = this.get();
-              var i = da.indexOf(oldSlot);
-              if(i < 0)
-                return;
-              da.splice(i, 1, newSlot);
-              this.set(da);
-            }
-          });
+        // the IO service
+        var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+
+        do {
+          // create an nsIURI
+          var uri = ioService.newURI(headerLocation == null ? aUrl : headerLocation, null, null);
+
+          // get a channel for that nsIURI
+          var ch = ioService.newChannelFromURI(uri);
+          try {
+            ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
+            ch.redirectionLimit = 0;
+
+            ch.open();
+
+            try {
+              headerLocation = ch.getResponseHeader("location")
+            } catch (ex) {}
+            try {
+              headerContentDisp = ch.getResponseHeader("content-disposition");
+            } catch (ex) {}
+
+            isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+            ch.cancel(Components.results.NS_BINDING_ABORTED);
+
+          } catch (ex) {}
+
+        } while(isRedirect)
+
+        var fileNameSource;
+
+        if( headerLocation != null)
+          fileNameSource = headerLocation;
+        else
+          fileNameSource = aUrl;
+
+        tim_matthews.downloadScheduler.dlScheduler_js.getFileNameInternal(fileNameSource, headerContentDisp, function(fileName) {
+          aCallback(fileName);
+        });
+
+      }
+
+    }; //dlctrl
+  
+    Application.storage.set("tim_matthews.downloadScheduler.downloadCtrl",  downloadCtrl );
 
           /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
           var oldIP = internalPersist;
@@ -170,31 +180,25 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
                 oldIP(persistArgs);
               else if(button==1)
                 return;
-              else if(button==2)
-                var args = {};
-                args.date = new Date();
-                args.saved = false;
-                window.openDialog("chrome://dlScheduler/content/timeChooseWin.xul", "tim_matthews.downloadScheduler.timeChooseWin", "chrome=yes, width=360, height=220, resizable=yes, modal=yes", args).focus();
-                if(!args.saved)
-                  return;
+              else if(button==2) {
                 var source = persistArgs.sourceURI.spec;
-                Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source , persistArgs.targetFile.path, false, args.date, null);
-
+                var fileName = persistArgs.targetFile.path;
+                window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
+              }
             }
         };
-      } catch (e) {
-          alert(e);
-      }
+
+      tim_matthews.downloadScheduler.dlScheduler_js.timerCtrl.setupTimers();
   },
  
   showScheduler: function() {
-      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=320, resizable=yes" ).focus();
+      window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
   },
 
   startDownload: function(scheduleSlot) {
 
   var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
-  var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).get();
+  var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null).getDownloads();
   Components.utils.import("resource://gre/modules/Downloads.jsm");
 
   Downloads.getList(Downloads.ALL).then(downloadsList => {
@@ -222,10 +226,10 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       newSlot.recurring = true;
       newSlot.dateInterval = scheduleSlot.dateInterval;
 
-      Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).updateSlot(scheduleSlot, newSlot);
+      Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl", null).updateSlot(scheduleSlot, newSlot);
   }
   else {
-    Application.storage.get("tim_matthews.downloadScheduler.downloadArray", null).removeSlot(scheduleSlot);
+    Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl", null).removeSlot(scheduleSlot);
   }
 
   var scheduleWindow = Components.classes["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator).getMostRecentWindow("tim_matthews.downloadScheduler.schedWindow");
@@ -238,7 +242,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
   },
 
-  getFileName: function(aURL, aContentDisposition, aCallback) {
+  getFileNameInternal: function(aURL, aContentDisposition, aCallback) {
 
   var saveMode = GetSaveModeForContentType(null, null);
 
@@ -260,84 +264,21 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     };
 
     getTargetFile(fpParams, aDialogCancelled => {
-        if (!aDialogCancelled)
-            aCallback(fpParams.file);
+        if (!aDialogCancelled && (fpParams != null)) 
+          aCallback(fpParams.file.path);
     });
 
   },
 
-
   scheduleLinkAs: function() {
     var Application = Components.classes["@mozilla.org/fuel/application;1"].getService(Components.interfaces.fuelIApplication);
+    var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null);
 
     var source = gContextMenu.linkURL;
 
-    var headerLocation = null;
-    var headerContentDisp = null
+    dlCtrl.urlChooseFile(source, function(fileName) {
 
-
-    var isRedirect = false;
-
-    // the IO service
-    var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-
-    do {
-      // create an nsIURI
-      var uri = ioService.newURI(headerLocation == null ? source : headerLocation, null, null);
-
-      // get a channel for that nsIURI
-      var ch = ioService.newChannelFromURI(uri);
-      try {
-        ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
-        ch.redirectionLimit = 0;
-
-        ch.open();
-
-        try {
-          headerLocation = ch.getResponseHeader("location")
-        } catch (ex) {}
-        try {
-          headerContentDisp = ch.getResponseHeader("content-disposition");
-        } catch (ex) {}
-
-        isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
-        ch.cancel(Components.results.NS_BINDING_ABORTED);
-
-      } catch (ex) {}
-
-    } while(isRedirect)
-
-    var fileNameSource;
-
-    if( headerLocation != null)
-      fileNameSource = headerLocation;
-    else
-      fileNameSource = source;
-
-      tim_matthews.downloadScheduler.dlScheduler_js.getFileName(fileNameSource, headerContentDisp, function(fileName) {
-
-      if( fileName == null)
-        return;
-
-      var args = {};
-      args.date = new Date();
-      args.saved = false;
-      
-
-      window.openDialog("chrome://dlScheduler/content/timeChooseWin.xul", "tim_matthews.downloadScheduler.timeChooseWin", "chrome=yes, width=360, height=420, resizable=yes, modal=yes", args).focus();
-
-      if(!args.saved)
-        return;
-
-      var targetFile = Components.classes["@mozilla.org/file/local;1"].createInstance(Components.interfaces.nsILocalFile);
-      targetFile.initWithFile(fileName);
-
-      if(!targetFile.exists())
-      targetFile.create(0x00,0644);
-
-
-    Application.storage.get("tim_matthews.downloadScheduler.downloadArray",  null).addOne(source, fileName, false, args.date, null);
-
+    window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
 
     });
   },
