@@ -36,7 +36,8 @@ tim_matthews.downloadScheduler.editWin_js = {
     var src = document.getElementById("tim_matthews.downloadScheduler.editWin.source").value;
 
     dlCtrl.urlChooseFile(src, function(fileName) {
-      document.getElementById("tim_matthews.downloadScheduler.editWin.target").value = fileName;
+      if(fileName != null)
+        document.getElementById("tim_matthews.downloadScheduler.editWin.target").value = fileName;
       window.focus();
     });
 

@@ -244,9 +244,22 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       file: file
     };
 
-    getTargetFile(fpParams, aDialogCancelled => {
-        if (!aDialogCancelled && (fpParams != null)) 
+    var gtf = null;
+
+    if(window['getTargetFile'] != undefined)
+      gtf = getTargetFile;
+    else 
+      gtf = function(aFpParams, aCallback) {
+        promiseTargetFile(aFpParams).then( aOk => { aCallback(!aOk); } );
+      };
+
+    gtf(fpParams, aDialogCancelled => {
+      if(fpParams != null) {
+        if(aDialogCancelled)
+          aCallback(null);
+        else
           aCallback(fpParams.file.path);
+      }
     });
 
   },
@@ -258,8 +271,9 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     var source = gContextMenu.linkURL;
 
     dlCtrl.urlChooseFile(source, function(fileName) {
-
-    window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
+    
+    if(fileName != null)
+      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
 
     });
   },
