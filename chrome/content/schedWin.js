@@ -28,7 +28,7 @@ tim_matthews.downloadScheduler.schedWin_js = {
   },
 
   addDownload: function() {
-      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal, width=490, height=100", -1, "", "");
+      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal", -1, "", "");
       tim_matthews.downloadScheduler.schedWin_js.refreshList();
   },
 
@@ -37,7 +37,7 @@ tim_matthews.downloadScheduler.schedWin_js = {
       if(index == -1)
           return;
       
-      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal, width=490, height=100", index);
+      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, modal", index);
       tim_matthews.downloadScheduler.schedWin_js.refreshList();
 
   },
