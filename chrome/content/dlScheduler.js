@@ -89,6 +89,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
 
         this.setDownloads(downloadArray);
 
+        prefs.setCharPref("extensions.tim_matthews.dlScheduler.dlScheduleTime", dateStart.getTime().toString());
       },
       removeSlot: function(slot) {
         var da = this.getDownloads();
@@ -181,7 +182,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
               else if(button==2) {
                 var source = persistArgs.sourceURI.spec;
                 var fileName = persistArgs.targetFile.path;
-                window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
+                window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
               }
             }
         };
@@ -273,7 +274,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
     dlCtrl.urlChooseFile(source, function(fileName) {
     
     if(fileName != null)
-      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome, width=490, height=100", -1, source, fileName);
+      window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
 
     });
   },

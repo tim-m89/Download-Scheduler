@@ -11,6 +11,8 @@ tim_matthews.downloadScheduler.editWin_js = {
 
     var urlBox = document.getElementById("tim_matthews.downloadScheduler.editWin.source");
     var targetBox = document.getElementById("tim_matthews.downloadScheduler.editWin.target");
+    var timePicker1 = document.getElementById("tim_matthews.downloadScheduler.editWin.timepick");
+    var datePicker1 = document.getElementById("tim_matthews.downloadScheduler.editWin.datepick");
 
     if(index>=0) {
       var downloadArray = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null).getDownloads();
@@ -19,12 +21,33 @@ tim_matthews.downloadScheduler.editWin_js = {
       urlBox.value = this.slot.source;
       targetBox.value = this.slot.target;
 
-      var timePicker1 = document.getElementById("tim_matthews.downloadScheduler.editWin.timepick");
       timePicker1.dateValue = new Date(this.slot.dateStart.getTime()); 
-      var datePicker1 = document.getElementById("tim_matthews.downloadScheduler.editWin.datepick");
       datePicker1.dateValue = new Date(this.slot.dateStart.getTime()); 
     }
     else {
+      var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
+      if(prefs.prefHasUserValue("extensions.tim_matthews.dlScheduler.dlScheduleTime")) {
+        var now = new Date();
+        var lastStart = new Date(parseInt(prefs.getCharPref("extensions.tim_matthews.dlScheduler.dlScheduleTime"), 10));
+        var newStart = null;
+
+        if(lastStart.getTime() > now.getTime()) {
+          newStart = lastStart;
+        } else {
+          newStart = new Date();
+          newStart.setHours( lastStart.getHours() );
+          newStart.setMinutes( lastStart.getMinutes() );
+          newStart.setSeconds( 0 );
+          
+          if(newStart.getTime() < now.getTime())
+            newStart.setTime( newStart.getTime() + 86400000 );
+        }
+
+        timePicker1.dateValue = new Date(newStart.getTime());
+        datePicker1.dateValue = new Date(newStart.getTime());
+
+      }
+
       urlBox.value = window.arguments[1];
       targetBox.value = window.arguments[2];
     }
