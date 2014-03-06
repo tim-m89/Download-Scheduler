@@ -4,10 +4,11 @@
 <window
     id="tim_matthews.downloadScheduler.editWin"
     title="&AddEdit;"
-    windowtype="tim_matthews.downloadScheduler.schedWindow"
+    windowtype="tim_matthews.downloadScheduler.editWindow"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
     onload="tim_matthews.downloadScheduler.editWin_js.loadDownload();"
-    onunload="">
+    onunload=""
+    style="margin: 0.4em;">
     <script src="editWin.js"></script>
     <vbox flex="1">
       <grid>
