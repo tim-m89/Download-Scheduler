@@ -14,6 +14,7 @@
       <grid>
         <columns>
           <column flex="1"/>
+          <spacer width="30"/>
           <column flex="2"/>
         </columns>
         <rows>
@@ -34,7 +35,7 @@
           </row>
         </rows>
       </grid>
-      <spacer flex="1"/>
+      <spacer height="10"/>
       <hbox>
         <spacer flex="1"/>
         <button height="30" width="100" label="&Save;" oncommand="tim_matthews.downloadScheduler.editWin_js.save();"/>
