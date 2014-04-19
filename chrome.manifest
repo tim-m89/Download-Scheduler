@@ -1,4 +1,5 @@
 content     dlScheduler    chrome/content/
+style chrome://global/content/customizeToolbar.xul chrome://dlScheduler/content/button.css
 
 locale	dlScheduler	de	chrome/locale/de/
 locale	dlScheduler	el	chrome/locale/el/
@@ -9,5 +10,6 @@ locale	dlScheduler	it	chrome/locale/it/
 locale	dlScheduler	nl	chrome/locale/nl/
 locale	dlScheduler	sv-SE	chrome/locale/sv-SE/
 
+overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/button.xul
 overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/dlScheduler.xul
 

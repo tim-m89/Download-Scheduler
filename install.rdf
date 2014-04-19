@@ -18,6 +18,7 @@
     <em:description>Same firefox downloader. You choose the schedule.</em:description>
     <em:creator>Tim Matthews</em:creator>
     <em:homepageURL>http://sites.google.com/site/downloadscheduler/</em:homepageURL>
+    <em:iconURL>chrome://dlScheduler/content/Icon.jpg</em:iconURL>
     </Description>      
 </RDF>
 
