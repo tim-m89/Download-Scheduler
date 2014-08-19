@@ -10,7 +10,7 @@
       <Description>
         <em:id>{ec8030f7-c20a-464f-9b0e-13a3a9e97384}</em:id>
         <em:minVersion>26.0</em:minVersion>
-        <em:maxVersion>29.*</em:maxVersion>
+        <em:maxVersion>31.*</em:maxVersion>
       </Description>
     </em:targetApplication>
    
@@ -19,6 +19,7 @@
     <em:creator>Tim Matthews</em:creator>
     <em:homepageURL>http://sites.google.com/site/downloadscheduler/</em:homepageURL>
     <em:iconURL>chrome://dlScheduler/content/Icon.png</em:iconURL>
+    <em:optionsURL>chrome://dlScheduler/content/schedPref.xul</em:optionsURL>
     </Description>      
 </RDF>
 
