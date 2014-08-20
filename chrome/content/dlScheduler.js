@@ -158,51 +158,65 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       },
       urlChooseFile: function(aUrl, aCallback) {
 
-        var fileNameSource = null;
+        var fileNameSource = aUri;
+        
+        var httpPreConnectForFileName = prefs.getBoolPref("extensions.tim_matthews.dlScheduler.httpPreConnectForFileName");
 
-        try {
+        if(httpPreConnectForFileName) {
 
-        var headerLocation = null;
-        var headerContentDisp = null;
-
-        var isRedirect = false;
-
-        // the IO service
-        var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
-
-        do {
-          // create an nsIURI
-          var uri = ioService.newURI(headerLocation == null ? aUrl : headerLocation, null, null);
-
-          // get a channel for that nsIURI
-          var ch = ioService.newChannelFromURI(uri);
+          // This try catch block is specifically for HTTP connections to infer a file name
           try {
-            ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
-            ch.redirectionLimit = 0;
 
-            ch.open();
+          var headerLocation = null;
+          var headerContentDisp = null;
+
+          var isRedirect = false;
+
+          var ioService = Components.classes["@mozilla.org/network/io-service;1"].getService(Components.interfaces.nsIIOService);
+
+          do {
+            // create an nsIURI using headerLocation if possible otherwise the aUri 
+            var uri = ioService.newURI(headerLocation == null ? aUrl : headerLocation, null, null);
+
+            // get a channel for that nsIURI
+            var ch = ioService.newChannelFromURI(uri);
 
             try {
-              headerLocation = ch.getResponseHeader("location")
-            } catch (ex) {}
-            try {
-              headerContentDisp = ch.getResponseHeader("content-disposition");
+
+              // This is HTTP specific so query that capability
+              ch = ch.QueryInterface(Components.interfaces.nsIHttpChannel);
+
+              // We are interested in following these a few times until we get the actual file 
+              ch.redirectionLimit = 10;
+
+              ch.open();
+
+              try {
+                // Look for a file location
+                headerLocation = ch.getResponseHeader("location")
+              } catch (ex) {}
+              try {
+                // Will take precedence in determining the target file name if available
+                headerContentDisp = ch.getResponseHeader("content-disposition");
+              } catch (ex) {}
+
+              isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+
+              // Make sure to close this channel since we only use it for the file name now and getting the content later
+              ch.cancel(Components.results.NS_BINDING_ABORTED);
+
             } catch (ex) {}
 
-            isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
-            ch.cancel(Components.results.NS_BINDING_ABORTED);
+          } while(isRedirect)
+
+
+          // If we saw location elements then use those as the url for the routine below to determine the file name
+          if( headerLocation != null)
+            fileNameSource = headerLocation;
 
           } catch (ex) {}
-
-        } while(isRedirect)
-
-
-        if( headerLocation != null)
-          fileNameSource = headerLocation;
-        else
-          fileNameSource = aUrl;
-
-        } catch (ex) {}
+          
+        }
 
         tim_matthews.downloadScheduler.dlScheduler_js.getFileNameInternal(fileNameSource, headerContentDisp, function(fileName) {
           aCallback(fileName);
