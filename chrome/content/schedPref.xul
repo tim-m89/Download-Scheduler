@@ -1,0 +1,21 @@
+<?xml version="1.0"?>
+<?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE prefwindow SYSTEM "chrome://dlScheduler/locale/translations.dtd">
+<prefwindow
+    id="tim_matthews.downloadScheduler.schedPrefWindow"
+    title="&DownloadSchedulerOptions;"
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
+    onload="tim_matthews.downloadScheduler.schedPref_js.prefLoad();">
+    <prefpane label="General">
+        <preferences>
+            <preference id="extensions.tim_matthews.dlScheduler.prefWin.stopEnabledPref" name="extensions.tim_matthews.dlScheduler.stopEnabled" type="bool" instantApply="false"/>
+            <preference id="extensions.tim_matthews.dlScheduler.prefWin.stopTimePref"   name="extensions.tim_matthews.dlScheduler.stopTime" type="string" instantApply="false"/>
+        </preferences>
+        <hbox>
+          <checkbox   id="tim_matthews.downloadScheduler.prefWin.chkStopEnabled" label="Stop all downloads at time:" preference="extensions.tim_matthews.dlScheduler.prefWin.stopEnabledPref"/>
+          <timepicker id="tim_matthews.downloadScheduler.prefWin.timePickStop" hideseconds="true"    preference="extensions.tim_matthews.dlScheduler.prefWin.stopTimePref"/>
+        </hbox>
+    </prefpane>
+    <script src="schedPref.js"></script>
+</prefwindow>
+
