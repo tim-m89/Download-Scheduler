@@ -6,6 +6,7 @@
 <!ENTITY Cancelselected "Annuler la sÃ©lection">
 <!ENTITY StartTime "Heure de dÃ©but:">
 <!ENTITY StopAllDownloadsAtTime "Arrêtez tous les téléchargements au moment:">
+<!ENTITY PreConnectToServerForFileName "Pré connecter au serveur pour améliorer fichier cible inférence nom par défaut">
 <!ENTITY ConfirmClose "Confirmer le fermer">
 <!ENTITY CloseMsg1 "Vous avez planifiÃ© tÃ©lÃ©chargements. Etes-vous sÃ»r de vouloir quitter la session actuelle de Firefox?">
 <!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les tÃ©lÃ©chargements prÃ©vue sera annulÃ©e.">

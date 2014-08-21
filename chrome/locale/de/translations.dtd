@@ -6,6 +6,7 @@
 <!ENTITY Cancelselected "Abbrechen gewählt">
 <!ENTITY StartTime "Startzeit:">
 <!ENTITY StopAllDownloadsAtTime "Beenden Sie alle Downloads auf Zeit:">
+<!ENTITY PreConnectToServerForFileName "Pre Verbindung zum Server, um die Zieldateiname Standard Inferenz verbessern">
 <!ENTITY ConfirmClose "Bestätigen Sie schließen">
 <!ENTITY CloseMsg1 "Sie haben Downloads geplant. Sie sind sicher, dass Sie die aktuelle Firefox-Sitzung zu beenden?">
 <!ENTITY CloseMsg2 "Wenn Sie auf 'OK' werden alle geplanten Downloads werden abgebrochen.">

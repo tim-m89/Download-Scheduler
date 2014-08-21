@@ -6,6 +6,7 @@
 <!ENTITY Cancelselected "Cancel selected">
 <!ENTITY StartTime "Start time:">
 <!ENTITY StopAllDownloadsAtTime "Stop all downloads at time:">
+<!ENTITY PreConnectToServerForFileName "Pre connect to server to enhance target file name default inference">
 <!ENTITY ConfirmClose "Confirm Close">
 <!ENTITY CloseMsg1 "You have scheduled downloads. Are you sure you want to quit the current firefox session?">
 <!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">

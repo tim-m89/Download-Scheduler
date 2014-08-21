@@ -6,6 +6,7 @@
 <!ENTITY Cancelselected "Ακύρωση επιλεγμένων">
 <!ENTITY StartTime "Ώρα έναρξης:">
 <!ENTITY StopAllDownloadsAtTime "Σταματήστε όλα τα downloads στο χρόνο:">
+<!ENTITY PreConnectToServerForFileName "Προ συνδεθείτε με το διακομιστή για την ενίσχυση αρχείο προορισμού προεπιλεγμένο όνομα συμπέρασμα">
 <!ENTITY ConfirmClose "Επιβεβαίωση Κλείσιμο">
 <!ENTITY CloseMsg1 "Έχετε προγραμματισμένες λήψεις. Είστε σίγουροι ότι θέλετε να κλείσετε την τρέχουσα περίοδο λειτουργίας του Firefox;">
 <!ENTITY CloseMsg2 "Εάν επιλέξετε 'OK 'για όλες τις προγραμματισμένες λήψεις θα ματαιωθεί.">

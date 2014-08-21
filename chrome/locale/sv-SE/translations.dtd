@@ -6,6 +6,7 @@
 <!ENTITY Cancelselected "Avbryt markerade">
 <!ENTITY StartTime "Starttid:">
 <!ENTITY StopAllDownloadsAtTime "Stoppa alla nedladdningar på tid:">
+<!ENTITY PreConnectToServerForFileName "Pre ansluta till servern för att förbättra mål filnamn default slutledning">
 <!ENTITY ConfirmClose "Bekräfta programavslut">
 <!ENTITY CloseMsg1 "Du har schemalagda hämtningar. Är du säker på att du vill avsluta den aktuella Firefox-sessionen?">
 <!ENTITY CloseMsg2 "Om du väljer &quot;OK&quot; kommer alla schemalagda hämtningar att avbrytas.">
