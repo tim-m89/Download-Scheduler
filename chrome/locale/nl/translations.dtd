@@ -5,7 +5,7 @@
 <!ENTITY Editselected "Bewerken geselecteerd">
 <!ENTITY Cancelselected "Annuleren geselecteerd">
 <!ENTITY StartTime "Start tijd:">
-<!ENTITY PauseTime "Pauze tijd:">
+<!ENTITY StopAllDownloadsAtTime "Stop alle downloads op het moment:">
 <!ENTITY ConfirmClose "Bevestig sluiten">
 <!ENTITY CloseMsg1 "Je hebt gepland downloads. Ben je zeker dat je de huidige Firefox-sessie afsluiten?">
 <!ENTITY CloseMsg2 "Als u kiest voor 'OK' voor alle geregistreerde downloads worden afgebroken.">

@@ -5,7 +5,7 @@
 <!ENTITY Editselected "Modifier la sélection">
 <!ENTITY Cancelselected "Annuler la sélection">
 <!ENTITY StartTime "Heure de début:">
-<!ENTITY PauseTime "Temps de pause:">
+<!ENTITY StopAllDownloadsAtTime "Arr�tez tous les t�l�chargements au moment:">
 <!ENTITY ConfirmClose "Confirmer le fermer">
 <!ENTITY CloseMsg1 "Vous avez planifié téléchargements. Etes-vous sûr de vouloir quitter la session actuelle de Firefox?">
 <!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les téléchargements prévue sera annulée.">

@@ -5,7 +5,7 @@
 <!ENTITY Editselected "Editar seleccionados">
 <!ENTITY Cancelselected "Anular el estilo seleccionado">
 <!ENTITY StartTime "Hora de inicio:">
-<!ENTITY PauseTime "Tiempo de pausa:">
+<!ENTITY StopAllDownloadsAtTime "Detener todas las descargas en tiempo:">
 <!ENTITY ConfirmClose "Confirmar Cierre">
 <!ENTITY CloseMsg1 "Se han programado descargas. ¿Está seguro que desea salir de la sesión actual de Firefox?">
 <!ENTITY CloseMsg2 "Si usted elige 'Aceptar' todas las descargas programadas se interrumpirá.">
