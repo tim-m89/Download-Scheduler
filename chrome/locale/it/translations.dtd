@@ -7,6 +7,7 @@
 <!ENTITY StartTime "Ora di inizio:">
 <!ENTITY StopAllDownloadsAtTime "Arrestare tutti i download a tempo di:">
 <!ENTITY PreConnectToServerForFileName "PRE connettersi al server per migliorare file di destinazione inferenza nome predefinito">
+<!ENTITY PreConnectToolTip "Questa è una funzione avanzata per aiutare il nome del file di destinazione inferenza. Funziona brevemente la connessione al server di ogni URL su programmazione, al fine di seguire i reindirizzamenti HTTP e per ottenere 'la disposizione dei contenuti' header in modo che il nome del file di destinazione predefinita può essere dedotto con maggiore precisione. Questa caratteristica è stata in precedenza solo permesso, ma è ora un'impostazione personalizzata che è disattivato per impostazione predefinita in quanto non è auspicabile per tutti.">
 <!ENTITY ConfirmClose "Conferma Chiudi">
 <!ENTITY CloseMsg1 "Hai in programma di download. Sei sicuro di voler chiudere la sessione corrente di Firefox?">
 <!ENTITY CloseMsg2 "Se scegli 'OK' tutti i download di linea sarà interrotta.">

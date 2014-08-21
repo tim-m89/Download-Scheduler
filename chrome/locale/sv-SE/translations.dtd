@@ -7,6 +7,7 @@
 <!ENTITY StartTime "Starttid:">
 <!ENTITY StopAllDownloadsAtTime "Stoppa alla nedladdningar på tid:">
 <!ENTITY PreConnectToServerForFileName "Pre ansluta till servern för att förbättra mål filnamn default slutledning">
+<!ENTITY PreConnectToolTip "Detta är en avancerad funktion för att hjälpa målet filnamnet slutledning. Det fungerar genom att kort att ansluta till servern för varje webbadress vid schemaläggning för att följa HTTP omdirigeringar och för att erhålla 'innehåll disposition' rubriker så att målet filnamnet default kan härledas med större noggrannhet. Den här funktionen var tidigare endast aktiverad men är nu en anpassad inställning som är inaktiverad som standard, eftersom det inte är önskvärt för alla.">
 <!ENTITY ConfirmClose "Bekräfta programavslut">
 <!ENTITY CloseMsg1 "Du har schemalagda hämtningar. Är du säker på att du vill avsluta den aktuella Firefox-sessionen?">
 <!ENTITY CloseMsg2 "Om du väljer &quot;OK&quot; kommer alla schemalagda hämtningar att avbrytas.">

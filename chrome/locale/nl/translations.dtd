@@ -7,6 +7,7 @@
 <!ENTITY StartTime "Start tijd:">
 <!ENTITY StopAllDownloadsAtTime "Stop alle downloads op het moment:">
 <!ENTITY PreConnectToServerForFileName "Pre verbinding maken met server om het doel bestandsnaam default gevolgtrekking verbeteren">
+<!ENTITY PreConnectToolTip "Dit is een geavanceerde functie om het doel bestandsnaam gevolgtrekking helpen. Het werkt door kort verbinding met de server van elke URL op planning om HTTP redirects volgen en 'content disposition' headers verkrijgen zodat het doelbestand standaardnaam kan worden afgeleid nauwkeuriger. Deze functie was voorheen alleen mogelijk, maar is nu een aangepaste instelling die standaard is uitgeschakeld, omdat het niet wenselijk is voor iedereen.">
 <!ENTITY ConfirmClose "Bevestig sluiten">
 <!ENTITY CloseMsg1 "Je hebt gepland downloads. Ben je zeker dat je de huidige Firefox-sessie afsluiten?">
 <!ENTITY CloseMsg2 "Als u kiest voor 'OK' voor alle geregistreerde downloads worden afgebroken.">

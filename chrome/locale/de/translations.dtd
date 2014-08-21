@@ -7,6 +7,7 @@
 <!ENTITY StartTime "Startzeit:">
 <!ENTITY StopAllDownloadsAtTime "Beenden Sie alle Downloads auf Zeit:">
 <!ENTITY PreConnectToServerForFileName "Pre Verbindung zum Server, um die Zieldateiname Standard Inferenz verbessern">
+<!ENTITY PreConnectToolTip "Dies ist eine erweiterte Funktion, um den Namen der Zieldatei Inferenz zu helfen. Es funktioniert, indem Sie kurz die Verbindung zum Server der jede URL auf Planung, um HTTP-Weiterleitungen zu folgen und 'Content-Disposition-' Header zu erhalten, so dass der Name der Zieldatei standardmäßig mit größerer Genauigkeit zu entnehmen. Dieses Feature wurde bisher nur aktiviert, aber ist jetzt eine benutzerdefinierte Einstellung, die standardmäßig deaktiviert ist, da es nicht für alle wünschenswert.">
 <!ENTITY ConfirmClose "Bestätigen Sie schließen">
 <!ENTITY CloseMsg1 "Sie haben Downloads geplant. Sie sind sicher, dass Sie die aktuelle Firefox-Sitzung zu beenden?">
 <!ENTITY CloseMsg2 "Wenn Sie auf 'OK' werden alle geplanten Downloads werden abgebrochen.">

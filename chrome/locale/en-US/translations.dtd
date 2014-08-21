@@ -7,6 +7,7 @@
 <!ENTITY StartTime "Start time:">
 <!ENTITY StopAllDownloadsAtTime "Stop all downloads at time:">
 <!ENTITY PreConnectToServerForFileName "Pre connect to server to enhance target file name default inference">
+<!ENTITY PreConnectToolTip "This is an advanced feature to help the target file name inference. It works by briefly connecting to the server of each URL upon scheduling in order to follow HTTP redirects and to obtain 'content disposition' headers so that the target file name default can be inferred with greater accuracy. This feature was previously only enabled but is now a custom setting that is disabled by default since it is not desirable for everyone.">
 <!ENTITY ConfirmClose "Confirm Close">
 <!ENTITY CloseMsg1 "You have scheduled downloads. Are you sure you want to quit the current firefox session?">
 <!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">
