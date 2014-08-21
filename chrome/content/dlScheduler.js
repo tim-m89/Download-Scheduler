@@ -158,7 +158,7 @@ tim_matthews.downloadScheduler.dlScheduler_js = {
       },
       urlChooseFile: function(aUrl, aCallback) {
 
-        var fileNameSource = aUri;
+        var fileNameSource = aUrl;
         
         var httpPreConnectForFileName = prefs.getBoolPref("extensions.tim_matthews.dlScheduler.httpPreConnectForFileName");
 
