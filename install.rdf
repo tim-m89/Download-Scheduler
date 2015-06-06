@@ -13,12 +13,12 @@
         <em:maxVersion>31.*</em:maxVersion>
       </Description>
     </em:targetApplication>
-   
     <em:name>Download Scheduler</em:name>
     <em:description>Same firefox downloader. You choose the schedule.</em:description>
     <em:creator>Tim Matthews</em:creator>
     <em:homepageURL>http://sites.google.com/site/downloadscheduler/</em:homepageURL>
     <em:iconURL>chrome://dlScheduler/content/Icon.png</em:iconURL>
+    <em:bootstrap>true</em:bootstrap>
     <em:optionsURL>chrome://dlScheduler/content/schedPref.xul</em:optionsURL>
     </Description>      
 </RDF>
