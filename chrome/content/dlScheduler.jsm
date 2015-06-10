@@ -11,10 +11,11 @@ var ScheduleDownloadItem = function(source, target, startDateTime) {
 };
 
 var DownloadSchedulerState = {
-  scheduleItems : []    ,
-  itemTimers    : []    ,
-  stopAllTimer  : null  ,
-  prefBranch    : null
+  scheduleItems           : []    ,
+  itemTimers              : []    ,
+  stopAllTimer            : null  ,
+  prefBranch              : null  ,
+  originalInternalPersist : null
 }
 
 var PreferenceObserver = {
@@ -102,7 +103,7 @@ var DownloadScheduler = {
     var msFin = stopDate.getTime() - now.getTime();
 
     DownloadSchedulerState.stopAllTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
-    DownloadSchedulerState.stopAllTimer.initWithCallback({ notify: function(timerr) { DownloadSchedulerInternal.stopDownloads(); } }, msFin, Ci.nsITimer.TYPE_ONE_SHOT);
+    DownloadSchedulerState.stopAllTimer.initWithCallback({ notify: function(timerr) { DownloadScheduler.stopAllDownloads(); } }, msFin, Ci.nsITimer.TYPE_ONE_SHOT);
 
   },
 
@@ -116,6 +117,12 @@ var DownloadScheduler = {
   },
 
   addContextMenuEntries: function() {
+
+    var contextMenu = document.getElementById("contentAreaContextMenu");
+
+    if (contextMenu)
+      contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
+
   },
 
   removeContextMenuEntries: function() {
@@ -124,16 +131,143 @@ var DownloadScheduler = {
   scheduleUrl: function() {
   },
 
-  urlChooseFile: function() {
+  urlChooseFile: function(aUrl, aCallback) {
+
+    var fileNameSource = aUrl;
+
+    var httpPreConnectForFileName = DownloadSchedulerState.prefBranch.getBoolPref("httpPreConnectForFileName");
+
+    if(httpPreConnectForFileName) {
+
+      // This try catch block is specifically for HTTP connections to infer a file name
+      try {
+
+        var headerLocation = null;
+        var headerContentDisp = null;
+
+        var isRedirect = false;
+
+        var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+        do {
+          // create an nsIURI using headerLocation if possible otherwise the aUri
+          var uri = ioService.newURI(headerLocation == null ? aUrl : headerLocation, null, null);
+
+          // get a channel for that nsIURI
+          var ch = ioService.newChannelFromURI(uri);
+
+          try {
+
+            // This is HTTP specific so query that capability
+            ch = ch.QueryInterface(Ci.nsIHttpChannel);
+
+            // We are interested in following these a few times until we get the actual file
+            ch.redirectionLimit = 10;
+
+            ch.open();
+
+            try {
+              // Look for a file location
+              headerLocation = ch.getResponseHeader("location")
+            } catch (ex) {}
+
+            try {
+              // Will take precedence in determining the target file name if available
+              headerContentDisp = ch.getResponseHeader("content-disposition");
+            } catch (ex) {}
+
+            isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
+
+            // Make sure to close this channel since we only use it for the file name now and getting the content later
+            ch.cancel(Components.results.NS_BINDING_ABORTED);
+
+          } catch (ex) {}
+
+        } while(isRedirect)
+
+
+        // If we saw location elements then use those as the url for the routine below to determine the file name
+        if( headerLocation != null)
+          fileNameSource = headerLocation;
+
+      } catch (ex) {}
+
+    }
+
+    DownloadScheduler.resolveFileName(fileNameSource, headerContentDisp, aCallback );
+
+  },
+
+  resolveFileName: function(aURL, aContentDisposition, aCallback) {
+
+    var saveMode = GetSaveModeForContentType(null, null);
+
+    var file, sourceURI, saveAsType;
+    // Find the URI object for aURL and the FileName/Extension to use when saving.
+    // FileName/Extension will be ignored if aChosenData supplied.
+    var fileInfo = new FileInfo(null);
+    initFileInfo(fileInfo, aURL, null, null,
+    null, aContentDisposition);
+    sourceURI = fileInfo.uri;
+
+    var fpParams = {
+      fpTitleKey: null, //todo add to string bundle: "Enter name of file for scheduled download...",
+      fileInfo: fileInfo,
+      contentType: null,
+      saveMode: saveMode,
+      saveAsType: kSaveAsType_Complete,
+      file: file
+    };
+
+    var gtf = null;
+
+    if(window['getTargetFile'] != undefined)
+      gtf = getTargetFile;
+    else
+      gtf = function(aFpParams, aCallback) {
+        promiseTargetFile(aFpParams).then( aOk => { aCallback(!aOk); } );
+    };
+
+    gtf(fpParams, aDialogCancelled => {
+      if(fpParams != null) {
+        if(aDialogCancelled)
+          aCallback(null);
+        else
+          aCallback(fpParams.file.path);
+      }
+    } );
+
   },
 
   addItem: function() {
   },
 
-  removeItem: function() {
+  removeItem: function(scheduleItem) {
+
+    var i = DownloadSchedulerState.scheduleItems.indexOf(scheduleItem);
+
+    if(i < 0)
+      return;
+
+    DownloadSchedulerState.scheduleItems.splice(i, 1);
+
+    DownloadScheduler.saveScheduleItems();
+
   },
 
   loadScheduleItems: function() {
+
+    var data = prefs.getComplexValue("dlScheduleList", Ci.nsISupportsString).data;
+
+    DownloadSchedulerState.scheduleItems = JSON.parse(data, function(k,v) {
+
+      if((k == "dateStart") || (k == "dateInterval"))
+        return new Date(v);
+
+      return v;
+
+    } );
+
   },
 
   saveScheduleItems: function() {
@@ -206,6 +340,67 @@ var DownloadScheduler = {
     var contextSep      = document.getElementById("tim_matthews.downloadScheduler.context-separator1");
     contextSched.hidden = document.getElementById("context-savelink").hidden;
     contextSep.hidden   = contextSched.hidden;
+  },
+
+  stopAllDownloads: function() {
+    Cu.import("resource://gre/modules/Downloads.jsm");
+
+    Downloads.getList(Downloads.ALL).then(downloadsList => { downloadsList.getAll().then(allDownloads => {
+
+      for(var i = 0; i < allDownloads.length; i++) {
+
+        var download = allDownloads[i];
+
+        download.cancel().then();
+
+      }
+
+    } ) } );
+
+  },
+
+  newInternalPersist: function(persistArgs) {
+    /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
+
+    var oldIP = DownloadSchedulerState.originalInternalPersist;
+
+    if(persistArgs.sourceDocument)
+      oldIP(persistArgs); //only have option to schedule if not saving document
+    else {
+
+      var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+      var check = {value: false};
+      var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
+      var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
+
+      if(button==0)
+        oldIP(persistArgs);
+      else if(button==1)
+        return;
+      else if(button==2) {
+
+        var source = persistArgs.sourceURI.spec;
+        var fileName = persistArgs.targetFile.path;
+        window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
+
+      }
+    }
+
+  },
+
+  replaceInteralPersist: function() {
+    if(DownloadSchedulerState.originalInternalPersist != null)
+      return;
+
+    DownloadSchdulerState.originalInternalPersist = internalPersist;
+    internalPersist = DownloadScheduler.newInternalPersist;
+  },
+
+  restoreInternalPersist: function() {
+    if(DownloadSchedulerState.originalInternalPersist == null)
+      return;
+
+    internalPersist = DownloadSchedulerState.originalInternalPersist;
   }
 
 
@@ -217,26 +412,6 @@ var DownloadScheduler = {
 
 
 
-init: function() {
-var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication); 
-var contextMenu = document.getElementById("contentAreaContextMenu");
-if (contextMenu)
-contextMenu.addEventListener("popupshowing", DownloadSchedulerInternal.thumbnailsShowHideItems, false);
-
-var downloadCtrl = {
-da: null,
-getDownloads: function() {
-if(!this.da) {
-this.da = JSON.parse(prefs.getComplexValue("extensions.tim_matthews.dlScheduler.dlScheduleList", Ci.nsISupportsString).data, function(k,v) {
-if((k == "dateStart") || (k == "dateInterval"))
-return new Date(v);
-return v; }
-);
-}
-return this.da;
-},
-setDownloads: function(arr) {
-},
 addOne: function(remote, local, dateStart) {
 var targetFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
 targetFile.initWithPath(local);
@@ -257,14 +432,7 @@ this.setDownloads(downloadArray);
 
 prefs.setCharPref("extensions.tim_matthews.dlScheduler.dlScheduleTime", dateStart.getTime().toString());
 },
-removeSlot: function(slot) {
-var da = this.getDownloads();
-var i = da.indexOf(slot);
-if(i < 0)
-return;
-da.splice(i, 1);
-this.setDownloads(da);
-},
+
 updateSlot: function(oldSlot, newSlot) {
 var da = this.getDownloads();
 var i = da.indexOf(oldSlot);
@@ -273,99 +441,10 @@ return;
 da.splice(i, 1, newSlot);
 this.setDownloads(da);
 },
-urlChooseFile: function(aUrl, aCallback) {
 
-var fileNameSource = aUrl;
-
-var httpPreConnectForFileName = prefs.getBoolPref("extensions.tim_matthews.dlScheduler.httpPreConnectForFileName");
-
-if(httpPreConnectForFileName) {
-
-// This try catch block is specifically for HTTP connections to infer a file name
-try {
-
-var headerLocation = null;
-var headerContentDisp = null;
-
-var isRedirect = false;
-
-var ioService = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
-
-do {
-// create an nsIURI using headerLocation if possible otherwise the aUri 
-var uri = ioService.newURI(headerLocation == null ? aUrl : headerLocation, null, null);
-
-// get a channel for that nsIURI
-var ch = ioService.newChannelFromURI(uri);
-
-try {
-
-// This is HTTP specific so query that capability
-ch = ch.QueryInterface(Ci.nsIHttpChannel);
-
-// We are interested in following these a few times until we get the actual file 
-ch.redirectionLimit = 10;
-
-ch.open();
-
-try {
-// Look for a file location
-headerLocation = ch.getResponseHeader("location")
-} catch (ex) {}
-try {
-// Will take precedence in determining the target file name if available
-headerContentDisp = ch.getResponseHeader("content-disposition");
-} catch (ex) {}
-
-isRedirect = ch.responseStatus >= 300 && ch.responseStatus <= 399;
-
-// Make sure to close this channel since we only use it for the file name now and getting the content later
-ch.cancel(Components.results.NS_BINDING_ABORTED);
-
-} catch (ex) {}
-
-} while(isRedirect)
-
-
-// If we saw location elements then use those as the url for the routine below to determine the file name
-if( headerLocation != null)
-fileNameSource = headerLocation;
-
-} catch (ex) {}
-
-}
-
-DownloadSchedulerInternal.getFileNameInternal(fileNameSource, headerContentDisp, function(fileName) {
-aCallback(fileName);
-});
-
-}
-
-}; //dlctrl
 
 Application.storage.set("tim_matthews.downloadScheduler.downloadCtrl",  downloadCtrl );
 
-/* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
-var oldIP = internalPersist;
-internalPersist = function(persistArgs) {
-if(persistArgs.sourceDocument)
-oldIP(persistArgs); //only have option to schedule if not saving document
-else {
-var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
-var check = {value: false};
-var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
-var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
-if(button==0)
-oldIP(persistArgs);
-else if(button==1)
-return;
-else if(button==2) {
-var source = persistArgs.sourceURI.spec;
-var fileName = persistArgs.targetFile.path;
-window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
-}
-}
-};
 
 
 DownloadSchedulerInternal.timerCtrl.setupTimers();
@@ -377,67 +456,6 @@ showScheduler: function() {
 window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
 },
 
-
-stopDownloads: function() {
-console.log("stopping downloads");
-
-Cu.import("resource://gre/modules/Downloads.jsm");
-
-Downloads.getList(Downloads.ALL).then(downloadsList => { downloadsList.getAll().then(allDownloads => {
-
-for(var i = 0; i < allDownloads.length; i++) {
-
-var download = allDownloads[i];
-
-download.cancel().then();
-
-}
-
-} ) } );
-
-
-},
-
-getFileNameInternal: function(aURL, aContentDisposition, aCallback) {
-
-var saveMode = GetSaveModeForContentType(null, null);
-
-var file, sourceURI, saveAsType;
-// Find the URI object for aURL and the FileName/Extension to use when saving.
-// FileName/Extension will be ignored if aChosenData supplied.
-var fileInfo = new FileInfo(null);
-initFileInfo(fileInfo, aURL, null, null,
-null, aContentDisposition);
-sourceURI = fileInfo.uri;
-
-var fpParams = {
-fpTitleKey: null, //todo add to string bundle: "Enter name of file for scheduled download...",
-fileInfo: fileInfo,
-contentType: null,
-saveMode: saveMode,
-saveAsType: kSaveAsType_Complete,
-file: file
-};
-
-var gtf = null;
-
-if(window['getTargetFile'] != undefined)
-gtf = getTargetFile;
-else 
-gtf = function(aFpParams, aCallback) {
-promiseTargetFile(aFpParams).then( aOk => { aCallback(!aOk); } );
-};
-
-gtf(fpParams, aDialogCancelled => {
-if(fpParams != null) {
-if(aDialogCancelled)
-aCallback(null);
-else
-aCallback(fpParams.file.path);
-}
-});
-
-},
 
 scheduleLinkAs: function() {
 var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
