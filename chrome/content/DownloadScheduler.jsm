@@ -68,6 +68,34 @@ var DownloadScheduler = {
 
   },
 
+  getDefaultScheduleItemTime: function() {
+
+    var scheduleTimeString = DownloadSchedulerState.prefBranch.getCharPref( "dlScheduleTime" );
+
+    var now               = new Date();
+    var lastStartDateTime = new Date( parseInt( scheduleTimeString, 10 ) );
+    var newStart          = null;
+
+    if(lastStartDateTime > now)
+      newStart = lastStartDateTime;
+    else {
+          newStart = new Date();
+          newStart.setHours( lastStart.getHours() );
+          newStart.setMinutes( lastStart.getMinutes() );
+          newStart.setSeconds( 0 );
+
+          if(newStart.getTime() < now.getTime())
+            newStart.setTime( newStart.getTime() + 86400000 );
+        }
+
+    return newStart;
+
+  },
+
+  setDefaultScheduleItemTime: function(startDateTime) {
+    DownloadSchedulerState.prefBranch.setCharPref( "dlScheduleTime", startDateTime.getTime().toString() );
+  },
+
   initItemTimers: function() {
 
     var items = DownloadScheduler.getScheduleItems();
