@@ -37,12 +37,14 @@ var DownloadScheduler = {
     DownloadScheduler.initItemTimers();
     DownloadScheduler.initStopAllTimer();
     DownloadScheduler.addContextMenuEntries();
+    DownloadScheduler.addToolbarButton();
     DownloadScheduler.replaceInternalPersist();
   },
 
   shutdown: function() {
     DownloadScheduler.restoreInternalPersist();
     DownloadScheduler.removeContextMenuEntries();
+    DownloadScheduler.removeToolbarButton();
     DownloadScheduler.shutdownItemTimers();
     DownloadScheduler.shutdownStopAllTimer();
     DownloadScheduler.saveScheduleItems();
@@ -162,6 +164,40 @@ var DownloadScheduler = {
       contextMenu.removeEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
     } );
+
+  },
+
+  addToolbarButton: function() {
+
+    Cu.import("resource:///modules/CustomizableUI.jsm");
+
+    var io = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+    var ss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+
+    var uri = io.newURI("chrome://dlScheduler/content/button.css", null, null);
+
+    ss.loadAndRegisterSheet(uri, ss.USER_SHEET);
+
+    var widget = {
+      id            : "dlScheduler-button"         ,
+      defaultArea   : CustomizableUI.AREA_NAVBAR   ,
+      label         : "Download Scheuler"          ,
+      tooltiptext   : "Download Scheduler"         ,
+      onCommand     : function(aEvent) { DownloadScheduler.showScheduleWindow(aEvent.target.ownerDocument.defaultView.content.document); }
+    };
+
+    CustomizableUI.createWidget(widget);
+
+  },
+
+  removeToolbarButton: function() {
+
+    CustomizableUI.destroyWidget("dlScheduler-button");
+
+    if (this._ss.sheetRegistered(this._uri, this._ss.USER_SHEET)) {
+      this._ss.unregisterSheet(this._uri, this._ss.USER_SHEET);
+    }
 
   },
 
