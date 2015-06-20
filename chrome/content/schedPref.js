@@ -1,18 +1,24 @@
-if(!tim_matthews) var tim_matthews={};
-if(!tim_matthews.downloadScheduler) tim_matthews.downloadScheduler={};
-if(!tim_matthews.downloadScheduler.schedPref_js) tim_matthews.downloadScheduler.schedPref_js = {};
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+const Cu = Components.utils;
 
-tim_matthews.downloadScheduler.schedPref_js = {
+DownloadScheduler_schedPref = {
+
   prefLoad: function() {
-      var timePickStop     = document.getElementById("tim_matthews.downloadScheduler.prefWin.timePickStop");
-      var chkStopEnabled = document.getElementById("tim_matthews.downloadScheduler.prefWin.chkStopEnabled");
-      
+
+      var timePickStop     = document.getElementById("DownloadScheduler.prefWin.timePickStop");
+      var chkStopEnabled   = document.getElementById("DownloadScheduler.prefWin.chkStopEnabled");
+
       var prefs = Components.classes["@mozilla.org/preferences-service;1"].getService(Components.interfaces.nsIPrefBranch);
 
-      timePickStop.value = prefs.getCharPref("extensions.tim_matthews.dlScheduler.stopTime");
-      chkStopEnabled.checked = prefs.getBoolPref("extensions.tim_matthews.dlScheduler.stopEnabled");
+      timePickStop.value      = prefs.getCharPref("extensions.DownloadScheduler.stopTime");
+      chkStopEnabled.checked  = prefs.getBoolPref("extensions.DownloadScheduler.stopEnabled");
+
       timePickStop.disabled = !chkStopEnabled.checked;
+
       chkStopEnabled.addEventListener("command", { handleEvent: function(ev){ timePickStop.disabled = !timePickStop.disabled; } }, false);
+
   }
-}
+
+};
 
