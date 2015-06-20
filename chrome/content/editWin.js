@@ -42,9 +42,9 @@ DownloadScheduler_editWin = {
         datePicker.dateValue = new Date(newStart.getTime());
       }
 
-      if(window.arguments.size >= 2)
+      if(window.arguments.length >= 2)
         urlBox.value    = window.arguments[1];
-      if(window.arguments.size >= 3)
+      if(window.arguments.length >= 3)
         targetBox.value = window.arguments[2];
 
     }
