@@ -32,19 +32,21 @@ var PreferenceObserver = {
 var DownloadScheduler = {
 
   init: function() {
-    initPrefs();
-    loadScheduleItems();
-    initItemTimers();
-    initStopAllTimer();
-    addContextMenuEntries();
+    DownloadScheduler.initPrefs();
+    DownloadScheduler.loadScheduleItems();
+    DownloadScheduler.initItemTimers();
+    DownloadScheduler.initStopAllTimer();
+    DownloadScheduler.addContextMenuEntries();
+    DownloadScheduler.replaceInternalPersist();
   },
 
   shutdown: function() {
-    removeContextMenuEntries();
-    shutdownItemTimers();
-    shutdownStopAllTimer();
-    saveScheduleItems();
-    shutdownPrefs();
+    DownloadScheduler.restoreInternalPersist();
+    DownloadScheduler.removeContextMenuEntries();
+    DownloadScheduler.shutdownItemTimers();
+    DownloadScheduler.shutdownStopAllTimer();
+    DownloadScheduler.saveScheduleItems();
+    DownloadScheduler.shutdownPrefs();
   },
 
   initPrefs: function() {
@@ -116,16 +118,51 @@ var DownloadScheduler = {
 
   },
 
+  foreachBrowserWindow: function(callBack) {
+
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    var enumerator = wm.getEnumerator("navigator:browser");
+
+    while(enumerator.hasMoreElements()) {
+      var win = enumerator.getNext();
+      callback(win);
+    }
+
+  },
+
   addContextMenuEntries: function() {
 
-    var contextMenu = document.getElementById("contentAreaContextMenu");
+    DownloadScheduler.foreachBrowserWindow(win => {
 
-    if (contextMenu)
+      var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+      var saveLinkAs     = win.document.getElementById("context-savelink");
+
+      var scheduleLinkAs = win.document.createElement("menuitem");
+        scheduleLinkAs.id = "DownloadScheduler.context-schedulelink";
+        scheduleLinkAs.oncommand = DownloadSchduler.scheduleLinkAs(contextMenu);
+
+      contextMenu.insertBefore(scheduleLinkAs, saveLinkAs.nextSibling);
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
+
+    } );
 
   },
 
   removeContextMenuEntries: function() {
+
+    DownloadScheduler.foreachBrowserWindow(win => {
+
+      var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+
+      var scheduleLinkAs = win.document.getElementById("DownloadSchduler.context-schedulelink");
+
+      contextMenu.removeChild(scheduleLinkAs);
+
+      contextMenu.removeEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
+
+    } );
+
   },
 
   scheduleUrl: function() {
@@ -239,7 +276,16 @@ var DownloadScheduler = {
 
   },
 
-  addItem: function() {
+  addItem: function(scheduleItem) {
+
+    DownloadSchedulerState.scheduleItems.push( scheduleItem );
+
+    DownloadSchedulerState.prefBranch.setCharPref( "dlScheduleTime", scheduelItem.startDateTime.getTime().toString() );
+
+    DownloadScheduler.initEmptyFile( scheduleItem.target );
+
+    DownloadScheduler.saveScheduleItems();
+
   },
 
   removeItem: function(scheduleItem) {
@@ -251,17 +297,19 @@ var DownloadScheduler = {
 
     DownloadSchedulerState.scheduleItems.splice(i, 1);
 
+    DownloadScheduler.removeEmptyFile( scheduleItem.target );
+
     DownloadScheduler.saveScheduleItems();
 
   },
 
   loadScheduleItems: function() {
 
-    var data = prefs.getComplexValue("dlScheduleList", Ci.nsISupportsString).data;
+    var data = DownloadSchedulerState.prefBranch.getComplexValue("dlScheduleList", Ci.nsISupportsString).data;
 
     DownloadSchedulerState.scheduleItems = JSON.parse(data, function(k,v) {
 
-      if((k == "dateStart") || (k == "dateInterval"))
+      if( (k == "startDateTime") || (k == "dateInterval") || (k == "dateStart") )
         return new Date(v);
 
       return v;
@@ -299,7 +347,7 @@ var DownloadScheduler = {
 
     var now = new Date();
 
-    var startDate = scheduleItem.dateStart;
+    var startDate = scheduleItem.startDateTime;
 
     var msStart = startDate.getTime() - now.getTime();
 
@@ -336,13 +384,18 @@ var DownloadScheduler = {
   },
 
   contextMenuPopupShowing: function(event) {
-    var contextSched    = document.getElementById("tim_matthews.downloadScheduler.context-schedulelink");
-    var contextSep      = document.getElementById("tim_matthews.downloadScheduler.context-separator1");
-    contextSched.hidden = document.getElementById("context-savelink").hidden;
-    contextSep.hidden   = contextSched.hidden;
+
+    var contextSched    = document.getElementById("DownloadScheduler.context-schedulelink");
+
+    var hidden          = document.getElementById("context-savelink").hidden;
+
+    contextSched.hidden = hidden;
+    contextSep.hidden   = hidden;
+
   },
 
   stopAllDownloads: function() {
+
     Cu.import("resource://gre/modules/Downloads.jsm");
 
     Downloads.getList(Downloads.ALL).then(downloadsList => { downloadsList.getAll().then(allDownloads => {
@@ -401,76 +454,47 @@ var DownloadScheduler = {
       return;
 
     internalPersist = DownloadSchedulerState.originalInternalPersist;
+  },
+
+  scheduleLinkAs: function(contextMenu) {
+
+    var source = contextMenu.linkURL;
+
+    DownloadScheduler.urlChooseFile(source, function(fileName) {
+
+      if(fileName != null)
+        window.openDialog("chrome://dlScheduler/content/editWin.xul", "", "chrome", -1, source, fileName);
+
+    } );
+
+  },
+
+  initEmptyFile: function(filePath) {
+
+    var targetFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+
+    targetFile.initWithPath(filePath);
+
+    if(!targetFile.exists())
+      targetFile.create(0x00,0644);
+
+  },
+
+  removeEmptyFile: function(filePath) {
+
+    var targetFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
+
+    targetFile.initWithPath(filePath);
+
+    if(targetFile.exists())
+      try {
+        targetFile.remove();
+      } catch (ex) { }
+
   }
 
 
 }; // DownloadScheduler
-
-
-
-
-
-
-
-addOne: function(remote, local, dateStart) {
-var targetFile = Cc["@mozilla.org/file/local;1"].createInstance(Ci.nsILocalFile);
-targetFile.initWithPath(local);
-
-if(!targetFile.exists())
-targetFile.create(0x00,0644);
-
-var downloadArray = this.getDownloads();
-
-var scheduleItem = {};
-scheduleItem.source = remote;
-scheduleItem.target = local;
-scheduleItem.dateStart = dateStart;
-
-downloadArray.push(scheduleItem);
-
-this.setDownloads(downloadArray);
-
-prefs.setCharPref("extensions.tim_matthews.dlScheduler.dlScheduleTime", dateStart.getTime().toString());
-},
-
-updateSlot: function(oldSlot, newSlot) {
-var da = this.getDownloads();
-var i = da.indexOf(oldSlot);
-if(i < 0)
-return;
-da.splice(i, 1, newSlot);
-this.setDownloads(da);
-},
-
-
-Application.storage.set("tim_matthews.downloadScheduler.downloadCtrl",  downloadCtrl );
-
-
-
-DownloadSchedulerInternal.timerCtrl.setupTimers();
-DownloadSchedulerInternal.timerCtrl.setupStopTimer();
-
-},
-
-showScheduler: function() {
-window.open("chrome://dlScheduler/content/schedWin.xul", "tim_matthews.downloadScheduler.schedWin", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
-},
-
-
-scheduleLinkAs: function() {
-var Application = Cc["@mozilla.org/fuel/application;1"].getService(Ci.fuelIApplication);
-var dlCtrl = Application.storage.get("tim_matthews.downloadScheduler.downloadCtrl",  null);
-
-var source = gContextMenu.linkURL;
-
-dlCtrl.urlChooseFile(source, function(fileName) {
-
-if(fileName != null)
-window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
-
-});
-},
-
 
 
 
