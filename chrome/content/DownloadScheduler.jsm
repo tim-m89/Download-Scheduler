@@ -498,7 +498,7 @@ var DownloadScheduler = {
 
         var source = persistArgs.sourceURI.spec;
         var fileName = persistArgs.targetFile.path;
-        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
+        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
 
       }
     }
@@ -527,7 +527,7 @@ var DownloadScheduler = {
     DownloadScheduler.urlChooseFile(source, function(fileName) {
 
       if(fileName != null)
-        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", -1, source, fileName);
+        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
 
     } );
 
