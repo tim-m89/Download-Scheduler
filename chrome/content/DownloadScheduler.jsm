@@ -70,6 +70,9 @@ var DownloadScheduler = {
 
   getDefaultScheduleItemTime: function() {
 
+    if(!DownloadSchedulerState.prefBranch.prefHasUserValue("dlScheduleTime"))
+      return null;
+
     var scheduleTimeString = DownloadSchedulerState.prefBranch.getCharPref( "dlScheduleTime" );
 
     var now               = new Date();
