@@ -175,12 +175,12 @@ var DownloadScheduler = {
 
     var ss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
 
-    var uri = io.newURI("chrome://dlScheduler/content/button.css", null, null);
+    var uri = io.newURI("chrome://DownloadScheduler/content/button.css", null, null);
 
     ss.loadAndRegisterSheet(uri, ss.USER_SHEET);
 
     var widget = {
-      id            : "dlScheduler-button"         ,
+      id            : "DownloadScheduler-button"         ,
       defaultArea   : CustomizableUI.AREA_NAVBAR   ,
       label         : "Download Scheuler"          ,
       tooltiptext   : "Download Scheduler"         ,
@@ -193,7 +193,7 @@ var DownloadScheduler = {
 
   removeToolbarButton: function() {
 
-    CustomizableUI.destroyWidget("dlScheduler-button");
+    CustomizableUI.destroyWidget("DownloadScheduler-button");
 
     if (this._ss.sheetRegistered(this._uri, this._ss.USER_SHEET)) {
       this._ss.unregisterSheet(this._uri, this._ss.USER_SHEET);
@@ -470,7 +470,7 @@ var DownloadScheduler = {
 
         var source = persistArgs.sourceURI.spec;
         var fileName = persistArgs.targetFile.path;
-        window.openDialog("chrome://dlScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
+        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "tim_matthews.downloadScheduler.editWin", "chrome", -1, source, fileName);
 
       }
     }
@@ -499,7 +499,7 @@ var DownloadScheduler = {
     DownloadScheduler.urlChooseFile(source, function(fileName) {
 
       if(fileName != null)
-        window.openDialog("chrome://dlScheduler/content/editWin.xul", "", "chrome", -1, source, fileName);
+        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", -1, source, fileName);
 
     } );
 

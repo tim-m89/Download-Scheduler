@@ -1,4 +1,4 @@
-content     dlScheduler    chrome/content/
+content     DownloadScheduler    chrome/content/
 
 locale	dlScheduler	de	chrome/locale/de/
 locale	dlScheduler	el	chrome/locale/el/
