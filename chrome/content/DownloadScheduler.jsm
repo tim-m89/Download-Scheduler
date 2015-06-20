@@ -372,10 +372,13 @@ var DownloadScheduler = {
 
     DownloadSchedulerState.scheduleItems.splice(i, 1);
 
-    DownloadScheduler.removeEmptyFile( scheduleItem.target );
-
     DownloadScheduler.saveScheduleItems();
 
+  },
+
+  cancelItem: function(scheduleItem) {
+    DownloadScheduler.removeItem(scheduleItem);
+    DownloadScheduler.removeEmptyFile( scheduleItem.target );
   },
 
   loadScheduleItems: function() {
@@ -401,6 +404,10 @@ var DownloadScheduler = {
 
     DownloadSchedulerState.prefBranch.setComplexValue("dlScheduleList", Ci.nsISupportsString, str)
 
+  },
+
+  getAllScheduleItems: function() {
+    return DownloadSchedulerState.scheduleItems;
   },
 
   timeStringToDate: function(timeString) {
@@ -561,7 +568,7 @@ var DownloadScheduler = {
 
     targetFile.initWithPath(filePath);
 
-    if(targetFile.exists())
+    if( (targetFile.exists()) && (targetFile.fileSize==0) )
       try {
         targetFile.remove();
       } catch (ex) { }
