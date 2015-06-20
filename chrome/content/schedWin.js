@@ -2,7 +2,7 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
-Cu.import("chrome://content/DownloadScheduer/DownloadScheduler.jsm");
+Cu.import("chrome://DownloadScheduler/content/DownloadScheduler.jsm");
 
 DownloadScheduler_schedWin = {
 
