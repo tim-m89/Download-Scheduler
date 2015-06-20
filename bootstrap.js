@@ -2,17 +2,18 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
-Cu.import("chrome://content/DownloadScheduer/DownloadScheduler.jsm");
 
 function install(aData, aReason) {}
 
 function uninstall(aData, aReason) {}
 
 function startup(aData, aReason) {
+  Cu.import("chrome://DownloadScheduler/content/DownloadScheduler.jsm");
   DownloadScheduler.init();
 }
 
 function shutdown(aData, aReason) {
+  Cu.import("chrome://DownloadScheduler/content/DownloadScheduler.jsm");
   DownloadScheduler.shutdown();
 }
 
