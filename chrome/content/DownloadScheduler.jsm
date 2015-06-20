@@ -31,6 +31,8 @@ var PreferenceObserver = {
 
 var DownloadScheduler = {
 
+  ScheduleItem: ScheduleDownloadItem,
+
   init: function() {
     DownloadScheduler.initPrefs();
     DownloadScheduler.loadScheduleItems();
@@ -346,6 +348,12 @@ var DownloadScheduler = {
   addItem: function(scheduleItem) {
 
     DownloadSchedulerState.scheduleItems.push( scheduleItem );
+
+    DownloadScheduler.itemUpdated( scheduleItem );
+
+  },
+
+  itemUpdated: function(scheduleItem) {
 
     DownloadSchedulerState.prefBranch.setCharPref( "dlScheduleTime", scheduelItem.startDateTime.getTime().toString() );
 
