@@ -1,12 +1,12 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
-<!DOCTYPE window SYSTEM "chrome://dlScheduler/locale/translations.dtd">
+<!DOCTYPE window SYSTEM "chrome://DownloadScheduler/locale/translations.dtd">
 <window
-    id="tim_matthews.downloadScheduler.editWin"
+    id="DownloadScheduler.editWin"
     title="&AddEdit;"
-    windowtype="tim_matthews.downloadScheduler.editWindow"
+    windowtype="DownloadScheduler.editWindow"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    onload="tim_matthews.downloadScheduler.editWin_js.loadDownload();"
+    onload="DownloadScheduler_editWin.loadDownload();"
     onunload=""
     style="margin: 0.4em;">
     <script src="editWin.js"></script>
@@ -19,18 +19,18 @@
         </columns>
         <rows>
           <row align="baseline">
-            <label control="tim_matthews.downloadScheduler.editWin.source" value="&EnterSourceURL;"/>
-            <textbox id="tim_matthews.downloadScheduler.editWin.source" value="http://" />
+            <label control="DownloadScheduler.editWin.source" value="&EnterSourceURL;"/>
+            <textbox id="DownloadScheduler.editWin.source" value="http://" />
           </row>
           <row align="baseline">
-            <label control="tim_matthews.downloadScheduler.editWin.target" value="&ChooseTargetFile;"/>
-            <textbox id="tim_matthews.downloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="tim_matthews.downloadScheduler.editWin_js.chooseFile();"/>
+            <label control="DownloadScheduler.editWin.target" value="&ChooseTargetFile;"/>
+            <textbox id="DownloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="DownloadScheduler_editWin.chooseFile();"/>
           </row>
           <row align="baseline">
             <label value="&DateTime;"/>
             <hbox align="center">
-              <datepicker id="tim_matthews.downloadScheduler.editWin.datepick" type="popup"/>
-              <timepicker id="tim_matthews.downloadScheduler.editWin.timepick" hideseconds="true"/>
+              <datepicker id="DownloadScheduler.editWin.datepick" type="popup"/>
+              <timepicker id="DownloadScheduler.editWin.timepick" hideseconds="true"/>
             </hbox>
           </row>
         </rows>
@@ -38,7 +38,7 @@
       <spacer height="10"/>
       <hbox>
         <spacer flex="1"/>
-        <button height="30" width="100" label="&Save;" oncommand="tim_matthews.downloadScheduler.editWin_js.save();"/>
+        <button height="30" width="100" label="&Save;" oncommand="DownloadScheduler_editWin.save();"/>
         <button height="30" width="100" label="&Cancel;" onclick="window.close();"/>
       </hbox>
   </vbox>
