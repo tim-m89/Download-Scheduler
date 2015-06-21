@@ -4,6 +4,8 @@ const Cc = Components.classes;
 const Ci = Components.interfaces;
 const Cu = Components.utils;
 
+const PrefBranchName = "extensions.DownloadScheduler.";
+
 var ScheduleDownloadItem = function(source, target, startDateTime) {
   this.source        = source;
   this.target        = target;
@@ -55,11 +57,31 @@ var DownloadScheduler = {
 
   initPrefs: function() {
 
+    DownloadScheduler.initDefaultPrefs();
+
     var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
 
-    DownloadSchedulerState.prefBranch = prefService.getBranch("extensions.DownloadScheduler.");
+    DownloadSchedulerState.prefBranch = prefService.getBranch(PrefBranchName);
 
     DownloadSchedulerState.prefBranch.addObserver("", PreferenceObserver, false);
+
+  },
+
+
+  initDefaultPrefs: function() {
+
+    var prefService = Cc["@mozilla.org/preferences-service;1"].getService(Ci.nsIPrefService);
+
+    var defaultBranch = prefService.getDefaultBranch(PrefBranchName);
+
+    var str  = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
+      str.data = JSON.stringify([]);
+      defaultBranch.setComplexValue("dlScheduleList", Ci.nsISupportsString, str)
+
+    defaultBranch.setCharPref("dlScheduleTime", "0");
+    defaultBranch.setCharPref("stopTime", "0");
+    defaultBranch.setBoolPref("stopEnabled", false);
+    defaultBranch.setBoolPref("httpPreConnectForFileName", false);
 
   },
 
@@ -84,14 +106,16 @@ var DownloadScheduler = {
     if(lastStartDateTime > now)
       newStart = lastStartDateTime;
     else {
-          newStart = new Date();
-          newStart.setHours( lastStart.getHours() );
-          newStart.setMinutes( lastStart.getMinutes() );
-          newStart.setSeconds( 0 );
 
-          if(newStart.getTime() < now.getTime())
-            newStart.setTime( newStart.getTime() + 86400000 );
-        }
+      newStart = new Date();
+      newStart.setHours( lastStart.getHours() );
+      newStart.setMinutes( lastStart.getMinutes() );
+      newStart.setSeconds( 0 );
+
+      if(newStart.getTime() < now.getTime())
+        newStart.setTime( newStart.getTime() + 86400000 );
+
+    }
 
     return newStart;
 
