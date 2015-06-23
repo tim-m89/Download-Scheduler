@@ -127,7 +127,7 @@ var DownloadScheduler = {
 
   initItemTimers: function() {
 
-    var items = DownloadScheduler.getScheduleItems();
+    var items = DownloadSchedulerState.scheduleItems;
 
     for(var i = 0; i < items.length; i++) {
       var scheduleItem = items[i];
@@ -177,7 +177,7 @@ var DownloadScheduler = {
 
   },
 
-  foreachBrowserWindow: function(callBack) {
+  foreachBrowserWindow: function(aCallback) {
 
     var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
 
@@ -185,7 +185,7 @@ var DownloadScheduler = {
 
     while(enumerator.hasMoreElements()) {
       var win = enumerator.getNext();
-      callback(win);
+      aCallback(win);
     }
 
   },
@@ -197,11 +197,11 @@ var DownloadScheduler = {
       var contextMenu    = win.document.getElementById("contentAreaContextMenu");
       var saveLinkAs     = win.document.getElementById("context-savelink");
 
-      var scheduleLinkAs = win.document.createElement("menuitem");
-        scheduleLinkAs.id = "DownloadScheduler.context-schedulelink";
-        scheduleLinkAs.oncommand = DownloadSchduler.scheduleLinkAs(contextMenu);
+      var scheduleLinkAsElement = win.document.createElement("menuitem");
+        scheduleLinkAsElement.id = "DownloadScheduler.context-schedulelink";
+        scheduleLinkAsElement.oncommand = "DownloadScheduler.scheduleLinkAs(contextMenu);"
 
-      contextMenu.insertBefore(scheduleLinkAs, saveLinkAs.nextSibling);
+      contextMenu.insertBefore(scheduleLinkAsElement, saveLinkAs.nextSibling);
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
     } );
@@ -214,7 +214,7 @@ var DownloadScheduler = {
 
       var contextMenu    = win.document.getElementById("contentAreaContextMenu");
 
-      var scheduleLinkAs = win.document.getElementById("DownloadSchduler.context-schedulelink");
+      var scheduleLinkAs = win.document.getElementById("DownloadScheduler.context-schedulelink");
 
       contextMenu.removeChild(scheduleLinkAs);
 
@@ -239,7 +239,7 @@ var DownloadScheduler = {
     var widget = {
       id            : "DownloadScheduler-button"         ,
       defaultArea   : CustomizableUI.AREA_NAVBAR   ,
-      label         : "Download Scheuler"          ,
+      label         : "Download Scheduler"          ,
       tooltiptext   : "Download Scheduler"         ,
       onCommand     : function(aEvent) { DownloadScheduler.showScheduleWindow(aEvent.target.ownerDocument.defaultView.content.document); }
     };
@@ -547,12 +547,18 @@ var DownloadScheduler = {
 
   },
 
-  replaceInteralPersist: function() {
+  replaceInternalPersist: function() {
+
     if(DownloadSchedulerState.originalInternalPersist != null)
       return;
 
-    DownloadSchdulerState.originalInternalPersist = internalPersist;
-    internalPersist = DownloadScheduler.newInternalPersist;
+    DownloadScheduler.foreachBrowserWindow(win => {
+
+      DownloadSchedulerState.originalInternalPersist = win.internalPersist;
+      win.internalPersist = DownloadScheduler.newInternalPersist;
+
+    } );
+
   },
 
   restoreInternalPersist: function() {
