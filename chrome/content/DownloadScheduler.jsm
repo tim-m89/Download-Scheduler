@@ -199,7 +199,7 @@ var DownloadScheduler = {
 
       var scheduleLinkAsElement = win.document.createElement("menuitem");
         scheduleLinkAsElement.id = "DownloadScheduler.context-schedulelink";
-        scheduleLinkAsElement.oncommand = "DownloadScheduler.scheduleLinkAs(contextMenu);"
+        scheduleLinkAsElement.oncommand = "DownloadScheduler.scheduleLinkAs(contextMenu);";
 
       contextMenu.insertBefore(scheduleLinkAsElement, saveLinkAs.nextSibling);
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
@@ -258,9 +258,14 @@ var DownloadScheduler = {
 
     CustomizableUI.destroyWidget("DownloadScheduler-button");
 
-    if (this._ss.sheetRegistered(this._uri, this._ss.USER_SHEET)) {
-      this._ss.unregisterSheet(this._uri, this._ss.USER_SHEET);
-    }
+    var io = Cc["@mozilla.org/network/io-service;1"].getService(Ci.nsIIOService);
+
+    var ss = Cc["@mozilla.org/content/style-sheet-service;1"].getService(Ci.nsIStyleSheetService);
+
+    var uri = io.newURI("chrome://DownloadScheduler/content/button.css", null, null);
+
+    if(ss.sheetRegistered(uri, ss.USER_SHEET))
+      ss.unregisterSheet(uri, ss.USER_SHEET);
 
   },
 
