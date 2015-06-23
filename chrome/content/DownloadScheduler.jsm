@@ -241,10 +241,16 @@ var DownloadScheduler = {
       defaultArea   : CustomizableUI.AREA_NAVBAR   ,
       label         : "Download Scheduler"          ,
       tooltiptext   : "Download Scheduler"         ,
-      onCommand     : function(aEvent) { DownloadScheduler.showScheduleWindow(aEvent.target.ownerDocument.defaultView.content.document); }
+      onCommand     : function(aEvent) { DownloadScheduler.showScheduleWindow(aEvent); }
     };
 
     CustomizableUI.createWidget(widget);
+
+  },
+
+  showScheduleWindow: function(aEvent) {
+
+    aEvent.target.ownerDocument.defaultView.open( "chrome://DownloadScheduler/content/schedWin.xul", "", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
 
   },
 
