@@ -190,6 +190,19 @@ var DownloadScheduler = {
 
   },
 
+  firstBrowserWindow: function() {
+
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    var enumerator = wm.getEnumerator("navigator:browser");
+
+    while(enumerator.hasMoreElements()) {
+      var win = enumerator.getNext();
+      return win;
+    }
+
+  },
+
   addContextMenuEntries: function() {
 
     DownloadScheduler.foreachBrowserWindow(win => {
@@ -198,8 +211,9 @@ var DownloadScheduler = {
       var saveLinkAs     = win.document.getElementById("context-savelink");
 
       var scheduleLinkAsElement = win.document.createElement("menuitem");
-        scheduleLinkAsElement.id = "DownloadScheduler.context-schedulelink";
-        scheduleLinkAsElement.oncommand = "DownloadScheduler.scheduleLinkAs(contextMenu);";
+        scheduleLinkAsElement.id        = "DownloadScheduler.context-schedulelink";
+        scheduleLinkAsElement.setAttribute("label", "Schedule Link As...");
+        scheduleLinkAsElement.addEventListener("command", DownloadScheduler.scheduleLinkAs, false);
 
       contextMenu.insertBefore(scheduleLinkAsElement, saveLinkAs.nextSibling);
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
@@ -214,9 +228,10 @@ var DownloadScheduler = {
 
       var contextMenu    = win.document.getElementById("contentAreaContextMenu");
 
-      var scheduleLinkAs = win.document.getElementById("DownloadScheduler.context-schedulelink");
+      var scheduleLinkAsElement = win.document.getElementById("DownloadScheduler.context-schedulelink");
 
-      contextMenu.removeChild(scheduleLinkAs);
+      if(scheduleLinkAsElement != null)
+        contextMenu.removeChild(scheduleLinkAsElement);
 
       contextMenu.removeEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
@@ -341,14 +356,15 @@ var DownloadScheduler = {
 
   resolveFileName: function(aURL, aContentDisposition, aCallback) {
 
-    var saveMode = GetSaveModeForContentType(null, null);
+    var win = DownloadScheduler.firstBrowserWindow();
+
+    var saveMode = win.GetSaveModeForContentType(null, null);
 
     var file, sourceURI, saveAsType;
     // Find the URI object for aURL and the FileName/Extension to use when saving.
     // FileName/Extension will be ignored if aChosenData supplied.
-    var fileInfo = new FileInfo(null);
-    initFileInfo(fileInfo, aURL, null, null,
-    null, aContentDisposition);
+    var fileInfo = new win.FileInfo(null);
+    win.initFileInfo(fileInfo, aURL, null, null, null, aContentDisposition);
     sourceURI = fileInfo.uri;
 
     var fpParams = {
@@ -356,17 +372,17 @@ var DownloadScheduler = {
       fileInfo: fileInfo,
       contentType: null,
       saveMode: saveMode,
-      saveAsType: kSaveAsType_Complete,
+      saveAsType: win.kSaveAsType_Complete,
       file: file
     };
 
     var gtf = null;
 
-    if(window['getTargetFile'] != undefined)
-      gtf = getTargetFile;
+    if(win['getTargetFile'] != undefined)
+      gtf = win.getTargetFile;
     else
       gtf = function(aFpParams, aCallback) {
-        promiseTargetFile(aFpParams).then( aOk => { aCallback(!aOk); } );
+        win.promiseTargetFile(aFpParams).then( aOk => { aCallback(!aOk); } );
     };
 
     gtf(fpParams, aDialogCancelled => {
@@ -390,7 +406,7 @@ var DownloadScheduler = {
 
   itemUpdated: function(scheduleItem) {
 
-    DownloadSchedulerState.prefBranch.setCharPref( "dlScheduleTime", scheduelItem.startDateTime.getTime().toString() );
+    DownloadSchedulerState.prefBranch.setCharPref( "dlScheduleTime", scheduleItem.startDateTime.getTime().toString() );
 
     DownloadScheduler.initEmptyFile( scheduleItem.target );
 
@@ -500,14 +516,15 @@ var DownloadScheduler = {
 
   },
 
-  contextMenuPopupShowing: function(event) {
+  contextMenuPopupShowing: function(aEvent) {
 
-    var contextSched    = document.getElementById("DownloadScheduler.context-schedulelink");
+    var doc = aEvent.target.ownerDocument;
 
-    var hidden          = document.getElementById("context-savelink").hidden;
+    var contextSched    = doc.getElementById("DownloadScheduler.context-schedulelink");
+
+    var hidden          = doc.getElementById("context-savelink").hidden;
 
     contextSched.hidden = hidden;
-    contextSep.hidden   = hidden;
 
   },
 
@@ -529,32 +546,38 @@ var DownloadScheduler = {
 
   },
 
-  newInternalPersist: function(persistArgs) {
-    /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
+  getNewInternalPersist: function(win) {
 
-    var oldIP = DownloadSchedulerState.originalInternalPersist;
+    var newInternalPersist = function(persistArgs) {
+      /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
 
-    if(persistArgs.sourceDocument)
-      oldIP(persistArgs); //only have option to schedule if not saving document
-    else {
+      var oldIP = DownloadSchedulerState.originalInternalPersist;
 
-      var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
-      var check = {value: false};
-      var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
-      var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
+      if(persistArgs.sourceDocument)
+        oldIP(persistArgs); //only have option to schedule if not saving document
+      else {
 
-      if(button==0)
-        oldIP(persistArgs);
-      else if(button==1)
-        return;
-      else if(button==2) {
+        var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
+        var check = {value: false};
+        var flags = prompts.BUTTON_POS_0 * prompts.BUTTON_TITLE_IS_STRING + prompts.BUTTON_POS_1 * prompts.BUTTON_TITLE_CANCEL + prompts.BUTTON_POS_2 * prompts.BUTTON_TITLE_IS_STRING;
+        var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
 
-        var source = persistArgs.sourceURI.spec;
-        var fileName = persistArgs.targetFile.path;
-        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
+        if(button==0)
+          oldIP(persistArgs);
+        else if(button==1)
+          return;
+        else if(button==2) {
 
+          var source = persistArgs.sourceURI.spec;
+          var fileName = persistArgs.targetFile.path;
+          win.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
+
+        }
       }
-    }
+
+    };
+
+    return newInternalPersist;
 
   },
 
@@ -566,7 +589,7 @@ var DownloadScheduler = {
     DownloadScheduler.foreachBrowserWindow(win => {
 
       DownloadSchedulerState.originalInternalPersist = win.internalPersist;
-      win.internalPersist = DownloadScheduler.newInternalPersist;
+      win.internalPersist = DownloadScheduler.getNewInternalPersist(win);
 
     } );
 
@@ -579,14 +602,18 @@ var DownloadScheduler = {
     internalPersist = DownloadSchedulerState.originalInternalPersist;
   },
 
-  scheduleLinkAs: function(contextMenu) {
+  scheduleLinkAs: function(aEvent) {
 
-    var source = contextMenu.linkURL;
+    var doc = aEvent.target.ownerDocument;
+
+    var win = doc.defaultView;
+
+    var source = win.gContextMenu.linkURL;
 
     DownloadScheduler.urlChooseFile(source, function(fileName) {
 
       if(fileName != null)
-        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
+        win.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome", null, source, fileName);
 
     } );
 
