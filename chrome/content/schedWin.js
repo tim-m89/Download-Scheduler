@@ -7,8 +7,8 @@ Cu.import("chrome://DownloadScheduler/content/DownloadScheduler.jsm");
 DownloadScheduler_schedWin = {
 
   getListBox: function() {
-    return document.getElementByID("DownloadScheduler.schedWin.listBoxItems");
-  }
+    return document.getElementById("DownloadScheduler.schedWin.listBoxItems");
+  },
 
   refreshList: function() {
 
