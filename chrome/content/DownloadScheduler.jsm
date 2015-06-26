@@ -10,6 +10,7 @@ var ScheduleDownloadItem = function(source, target, startDateTime) {
   this.source        = source;
   this.target        = target;
   this.startDateTime = startDateTime;
+  this.timer         = null;
 };
 
 var DownloadSchedulerState = {
@@ -131,16 +132,24 @@ var DownloadScheduler = {
 
     for(var i = 0; i < items.length; i++) {
       var scheduleItem = items[i];
-      DownloadSchedulerState.itemTimers.push( DownloadScheduler.setupTimer(scheduleItem) );
+      DownloadScheduler.scheduleItemSetupTimer( scheduleItem );
     }
 
   },
 
   shutdownItemTimers: function() {
 
-    while(DownloadSchedulerState.itemTimers.length > 0 ) {
-      var timer = DownloadSchedulerState.itemTimers.pop();
-      timer.cancel();
+    var items = DownloadSchedulerState.scheduleItems;
+
+    for(var i = 0; i < items.length; i++) {
+
+      var scheduleItem = items[i];
+
+      if(scheduleItem.tiimer) {
+        scheduleItem.timer.cancel();
+        scheduleItem.timer = null;
+      }
+
     }
 
   },
@@ -410,6 +419,8 @@ var DownloadScheduler = {
 
     DownloadScheduler.initEmptyFile( scheduleItem.target );
 
+    DownloadScheduler.scheduleItemSetupTimer( scheduleItem );
+
     DownloadScheduler.saveScheduleItems();
 
   },
@@ -451,7 +462,14 @@ var DownloadScheduler = {
 
     var str  = Cc["@mozilla.org/supports-string;1"].createInstance(Ci.nsISupportsString);
 
-    str.data = JSON.stringify(DownloadSchedulerState.scheduleItems);
+    str.data = JSON.stringify(DownloadSchedulerState.scheduleItems, function(k,v) {
+
+      if(k == "timer")
+        return undefined;
+      else
+        return v;
+
+    } );
 
     DownloadSchedulerState.prefBranch.setComplexValue("dlScheduleList", Ci.nsISupportsString, str)
 
@@ -478,17 +496,26 @@ var DownloadScheduler = {
 
   scheduleItemSetupTimer: function(scheduleItem) {
 
+    if(scheduleItem.timer) {
+
+      scheduleItem.timer.cancel();
+      scheduleItem.timer = null;
+
+    }
+
     var now = new Date();
 
     var startDate = scheduleItem.startDateTime;
 
     var msStart = startDate.getTime() - now.getTime();
 
-    var startTimer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
+    if(msStart > 0) {
 
-    startTimer.initWithCallback({ notify: function(timerr) { DownloadScheduler.scheduleItemStartDownload(scheduleItem); } }, msStart, Ci.nsITimer.TYPE_ONE_SHOT);
+      scheduleItem.timer = Cc["@mozilla.org/timer;1"].createInstance(Ci.nsITimer);
 
-    return startTimer;
+      scheduleItem.timer.initWithCallback({ notify: function(timerr) { DownloadScheduler.scheduleItemStartDownload(scheduleItem); } }, msStart, Ci.nsITimer.TYPE_ONE_SHOT);
+
+    }
 
   },
 
