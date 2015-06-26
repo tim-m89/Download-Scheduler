@@ -43,7 +43,7 @@ DownloadScheduler_schedWin = {
       var scheduleItem = listBox.selectedItem;
 
       if(scheduleItem != null)
-        window.openDialog("chrome://dlScheduler/content/editWin.xul", "", "chrome, modal", scheduleItem);
+        window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome, modal", scheduleItem);
 
   },
 
