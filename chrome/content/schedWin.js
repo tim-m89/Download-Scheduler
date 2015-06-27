@@ -10,6 +10,21 @@ DownloadScheduler_schedWin = {
     return document.getElementById("DownloadScheduler.schedWin.listBoxItems");
   },
 
+  getCurrentItem: function() {
+
+    var listBox = DownloadScheduler_schedWin.getListBox();
+
+    var index = listBox.selectedIndex;
+
+    if(index < 0)
+      return null;
+
+    var scheduleItems = DownloadScheduler.getAllScheduleItems();
+
+    return scheduleItems[ index ];
+
+  },
+
   refreshList: function() {
 
       var listBox = DownloadScheduler_schedWin.getListBox();
@@ -30,6 +45,7 @@ DownloadScheduler_schedWin = {
 
           listBox.appendItem(str, scheduleItem).setAttribute("tooltiptext", str);
       }
+
   },
 
   addItem: function() {
@@ -38,9 +54,7 @@ DownloadScheduler_schedWin = {
 
   editItem: function() {
 
-      var listBox = DownloadScheduler_schedWin.getListBox();
-
-      var scheduleItem = listBox.selectedItem;
+      var scheduleItem = DownloadScheduler_schedWin.getCurrentItem();
 
       if(scheduleItem != null)
         window.openDialog("chrome://DownloadScheduler/content/editWin.xul", "", "chrome, modal", scheduleItem);
@@ -48,12 +62,12 @@ DownloadScheduler_schedWin = {
   },
 
   cancelItem: function() {
-      var listBox = DownloadScheduler_schedWin.getListBox();
 
-      var scheduleItem = listBox.selectedItem;
+      var scheduleItem = DownloadScheduler_schedWin.getCurrentItem();
 
       if(scheduleItem != null)
         DownloadScheduler.cancelItem(scheduleItem);
+
   }
 
 };
