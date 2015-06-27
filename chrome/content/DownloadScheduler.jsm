@@ -101,11 +101,11 @@ var DownloadScheduler = {
     var scheduleTimeString = DownloadSchedulerState.prefBranch.getCharPref( "dlScheduleTime" );
 
     var now               = new Date();
-    var lastStartDateTime = new Date( parseInt( scheduleTimeString, 10 ) );
+    var lastStart         = new Date( parseInt( scheduleTimeString, 10 ) );
     var newStart          = null;
 
-    if(lastStartDateTime > now)
-      newStart = lastStartDateTime;
+    if(lastStart > now)
+      newStart = lastStart;
     else {
 
       newStart = new Date();
@@ -278,6 +278,15 @@ var DownloadScheduler = {
 
   },
 
+  refreshScheduleWindow: function() {
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    var scheduleWindow = wm.getMostRecentWindow("DownloadScheduler.schedWindow");
+
+    if(scheduleWindow)
+      scheduleWindow.DownloadScheduler_schedWin.refreshList();
+  },
+
   removeToolbarButton: function() {
 
     CustomizableUI.destroyWidget("DownloadScheduler-button");
@@ -423,6 +432,8 @@ var DownloadScheduler = {
 
     DownloadScheduler.saveScheduleItems();
 
+    DownloadScheduler.refreshScheduleWindow();
+
   },
 
   removeItem: function(scheduleItem) {
@@ -435,6 +446,8 @@ var DownloadScheduler = {
     DownloadSchedulerState.scheduleItems.splice(i, 1);
 
     DownloadScheduler.saveScheduleItems();
+
+    DownloadScheduler.refreshScheduleWindow();
 
   },
 
