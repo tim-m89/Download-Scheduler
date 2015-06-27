@@ -274,17 +274,26 @@ var DownloadScheduler = {
 
   showScheduleWindow: function(aEvent) {
 
-    aEvent.target.ownerDocument.defaultView.open( "chrome://DownloadScheduler/content/schedWin.xul", "", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    var scheduleWindow = wm.getMostRecentWindow("DownloadScheduler.schedWindow");
+
+    if(scheduleWindow)
+      scheduleWindow.focus();
+    else
+      aEvent.target.ownerDocument.defaultView.open( "chrome://DownloadScheduler/content/schedWin.xul", "", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
 
   },
 
   refreshScheduleWindow: function() {
+
     var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
 
     var scheduleWindow = wm.getMostRecentWindow("DownloadScheduler.schedWindow");
 
     if(scheduleWindow)
       scheduleWindow.DownloadScheduler_schedWin.refreshList();
+
   },
 
   removeToolbarButton: function() {
