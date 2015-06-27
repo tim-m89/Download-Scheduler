@@ -38,8 +38,8 @@ DownloadScheduler_editWin = {
       scheduleTime = DownloadScheduler.getDefaultScheduleItemTime();
 
       if(scheduleTime != null) {
-        timePicker.dateValue = new Date(newStart.getTime());
-        datePicker.dateValue = new Date(newStart.getTime());
+        timePicker.dateValue = new Date(scheduleTime.getTime());
+        datePicker.dateValue = new Date(scheduleTime.getTime());
       }
 
       if(window.arguments.length >= 2)
