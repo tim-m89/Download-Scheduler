@@ -30,8 +30,8 @@ DownloadScheduler_editWin = {
       urlBox.value    = scheduleItem.source;
       targetBox.value = scheduleItem.target;
 
-      timePicker.dateValue = new Date(this.slot.dateStart.getTime());
-      datePicker.dateValue = new Date(this.slot.dateStart.getTime());
+      timePicker.dateValue = new Date(scheduleItem.startDateTime.getTime());
+      datePicker.dateValue = new Date(scheduleItem.startDateTime.getTime());
 
     } else {
 
