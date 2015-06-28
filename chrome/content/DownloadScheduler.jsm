@@ -14,12 +14,11 @@ var ScheduleDownloadItem = function(source, target, startDateTime) {
 };
 
 var DownloadSchedulerState = {
-  scheduleItems           : []    ,
-  itemTimers              : []    ,
-  stopAllTimer            : null  ,
-  prefBranch              : null  ,
-  originalInternalPersist : null
-}
+  scheduleItems           : []   ,
+  itemTimers              : []   ,
+  stopAllTimer            : null ,
+  prefBranch              : null
+};
 
 var PreferenceObserver = {
 
@@ -30,7 +29,7 @@ var PreferenceObserver = {
 
   }
 
-}
+};
 
 var DownloadScheduler = {
 
@@ -41,14 +40,12 @@ var DownloadScheduler = {
     DownloadScheduler.loadScheduleItems();
     DownloadScheduler.initItemTimers();
     DownloadScheduler.initStopAllTimer();
-    DownloadScheduler.addContextMenuEntries();
     DownloadScheduler.addToolbarButton();
-    DownloadScheduler.replaceInternalPersist();
+    DownloadScheduler.initGuiBrowserWindows();
   },
 
   shutdown: function() {
-    DownloadScheduler.restoreInternalPersist();
-    DownloadScheduler.removeContextMenuEntries();
+    DownloadScheduler.shutdownGuiBrowserWindows();
     DownloadScheduler.removeToolbarButton();
     DownloadScheduler.shutdownItemTimers();
     DownloadScheduler.shutdownStopAllTimer();
@@ -212,11 +209,12 @@ var DownloadScheduler = {
 
   },
 
-  addContextMenuEntries: function() {
+  addContextMenuEntry: function(win) {
 
-    DownloadScheduler.foreachBrowserWindow(win => {
+    var contextMenu    = win.document.getElementById("contentAreaContextMenu");
 
-      var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+    if(contextMenu) {
+
       var saveLinkAs     = win.document.getElementById("context-savelink");
 
       var scheduleLinkAsElement = win.document.createElement("menuitem");
@@ -227,15 +225,17 @@ var DownloadScheduler = {
       contextMenu.insertBefore(scheduleLinkAsElement, saveLinkAs.nextSibling);
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
-    } );
+    }
+    else
+      win.console.log("no context menu entry");
 
   },
 
-  removeContextMenuEntries: function() {
+  removeContextMenuEntry: function(win) {
 
-    DownloadScheduler.foreachBrowserWindow(win => {
+    var contextMenu    = win.document.getElementById("contentAreaContextMenu");
 
-      var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+    if(contextMenu) {
 
       var scheduleLinkAsElement = win.document.getElementById("DownloadScheduler.context-schedulelink");
 
@@ -244,7 +244,7 @@ var DownloadScheduler = {
 
       contextMenu.removeEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
-    } );
+    }
 
   },
 
@@ -600,10 +600,8 @@ var DownloadScheduler = {
     var newInternalPersist = function(persistArgs) {
       /* Scheduling for any code that utilizes contentAreaUtils saving functionality (m4downloader for example) */
 
-      var oldIP = DownloadSchedulerState.originalInternalPersist;
-
       if(persistArgs.sourceDocument)
-        oldIP(persistArgs); //only have option to schedule if not saving document
+        win.internalPersist_(persistArgs); //only have option to schedule if not saving document
       else {
 
         var prompts = Cc["@mozilla.org/embedcomp/prompt-service;1"].getService(Ci.nsIPromptService);
@@ -612,7 +610,7 @@ var DownloadScheduler = {
         var button = prompts.confirmEx(null, "Download Scheduler", "Would you like to start the download now or schedule for later?", flags, "Download now", "", "Scheduler for later", null, check);
 
         if(button==0)
-          oldIP(persistArgs);
+          win.internalPersist_(persistArgs);
         else if(button==1)
           return;
         else if(button==2) {
@@ -630,25 +628,87 @@ var DownloadScheduler = {
 
   },
 
-  replaceInternalPersist: function() {
+  replaceInternalPersist: function(win) {
 
-    if(DownloadSchedulerState.originalInternalPersist != null)
-      return;
-
-    DownloadScheduler.foreachBrowserWindow(win => {
-
-      DownloadSchedulerState.originalInternalPersist = win.internalPersist;
-      win.internalPersist = DownloadScheduler.getNewInternalPersist(win);
-
-    } );
+    if( (win.internalPersist) && (!win.internalPersist_) ) {
+      win.internalPersist_ = win.internalPersist;
+      win.internalPersist  = DownloadScheduler.getNewInternalPersist(win);
+    }
 
   },
 
-  restoreInternalPersist: function() {
-    if(DownloadSchedulerState.originalInternalPersist == null)
-      return;
+  restoreInternalPersist: function(win) {
 
-    internalPersist = DownloadSchedulerState.originalInternalPersist;
+    if( (win.internalPersist) && (win.internalPersist_) ) {
+      win.internalPersist = win.internalPersist_;
+      delete win.internalPersist_;
+    }
+
+  },
+
+  windowListener: {
+    onOpenWindow: function(aWindow) {
+
+      let domWindow = aWindow.QueryInterface(Ci.nsIInterfaceRequestor).getInterface( Ci.nsIDOMWindow );
+
+      if( domWindow ) {
+
+        domWindow.addEventListener("load", function() {
+
+          if( domWindow.document.documentURI == "chrome://browser/content/browser.xul" ) {
+
+            domWindow.removeEventListener("load", arguments.callee, false);
+            DownloadScheduler.initGuiBrowserWindow( domWindow );
+
+          }
+
+        } );
+
+      }
+
+    },
+    onCloseWindow: function(aWindow) {
+    },
+    onWindowTitleChange: function(aWindow, aTitle) {
+    }
+  },
+
+  initGuiBrowserWindow: function(aWindow) {
+    DownloadScheduler.addContextMenuEntry( aWindow );
+    DownloadScheduler.replaceInternalPersist( aWindow );
+  },
+
+  initGuiBrowserWindows: function() {
+
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    DownloadScheduler.foreachBrowserWindow( win => {
+
+      DownloadScheduler.initGuiBrowserWindow( win );
+
+    } );
+
+    wm.addListener( DownloadScheduler.windowListener );
+
+  },
+
+  shutdownGuiBrowserWindow: function(aWindow) {
+    DownloadScheduler.removeContextMenuEntry( aWindow );
+    DownloadScheduler.restoreInternalPersist( aWindow );
+  },
+
+  shutdownGuiBrowserWindows: function() {
+
+    var wm = Cc["@mozilla.org/appshell/window-mediator;1"].getService(Components.interfaces.nsIWindowMediator);
+
+    wm.removeListener( DownloadScheduler.windowListener );
+
+    DownloadScheduler.foreachBrowserWindow( win => {
+
+      DownloadScheduler.shutdownGuiBrowserWindow( win );
+
+    } );
+
   },
 
   scheduleLinkAs: function(aEvent) {
