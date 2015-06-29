@@ -1,8 +1,9 @@
 <?xml version="1.0"?>
 <?xml-stylesheet href="chrome://global/skin/" type="text/css"?>
+<!DOCTYPE window SYSTEM "chrome://DownloadScheduler/locale/translations.dtd">
 <window
     id="DownloadScheduler.schedWin"
-    title="DownloadScheduler"
+    title="&DownloadScheduler;"
     onload="DownloadScheduler_schedWin.refreshList();"
     windowtype="DownloadScheduler.schedWindow"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
@@ -11,9 +12,9 @@
     <vbox flex="1" pack="end">
         <listbox minheight="40" minwidth="40" flex="1" id="DownloadScheduler.schedWin.listBoxItems" ondblclick="DownloadScheduler_schedWin.editItem();" />
         <hbox>
-          <button flex="1" minheight="30" maxheight="30" label="Addnew"         oncommand="DownloadScheduler_schedWin.addItem();" />
-          <button flex="1" minheight="30" maxheight="30" label="Editselected"   oncommand="DownloadScheduler_schedWin.editItem();" />
-          <button flex="1" minheight="30" maxheight="30" label="Cancelselected" oncommand="DownloadScheduler_schedWin.cancelItem();" />
+          <button flex="1" minheight="30" maxheight="30" label="&Addnew;"         oncommand="DownloadScheduler_schedWin.addItem();" />
+          <button flex="1" minheight="30" maxheight="30" label="&Editselected;"   oncommand="DownloadScheduler_schedWin.editItem();" />
+          <button flex="1" minheight="30" maxheight="30" label="&Cancelselected;" oncommand="DownloadScheduler_schedWin.cancelItem();" />
         </hbox>
     </vbox>
 </window>
