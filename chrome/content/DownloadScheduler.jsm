@@ -211,14 +211,14 @@ var DownloadScheduler = {
 
   addContextMenuEntry: function(win) {
 
-    var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+    var contextMenu = win.document.getElementById("contentAreaContextMenu");
 
     if(contextMenu) {
 
-      var saveLinkAs     = win.document.getElementById("context-savelink");
+      var saveLinkAs = win.document.getElementById("context-savelink");
 
       var scheduleLinkAsElement = win.document.createElement("menuitem");
-        scheduleLinkAsElement.id        = "DownloadScheduler.context-schedulelink";
+        scheduleLinkAsElement.id = "DownloadScheduler.context-schedulelink";
         scheduleLinkAsElement.setAttribute("label", "Schedule Link As...");
         scheduleLinkAsElement.addEventListener("command", DownloadScheduler.scheduleLinkAs, false);
 
@@ -226,20 +226,54 @@ var DownloadScheduler = {
       contextMenu.addEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
 
     }
-    else
-      win.console.log("no context menu entry");
+
+  },
+
+  addToolsMenuEntry: function(win) {
+
+    var toolsOpenDownloads = win.document.getElementById("menu_openDownloads");
+
+    if(toolsOpenDownloads) {
+
+      var toolsOpenDownloadsParent = toolsOpenDownloads.parentElement;
+
+      var toolsOpenDownloadScheduler = win.document.createElement("menuitem");
+        toolsOpenDownloadScheduler.id = "DownloadScheduler.menu_openDownloadScheduler";
+        toolsOpenDownloadScheduler.setAttribute("label", "Download Scheduler");
+        toolsOpenDownloadScheduler.addEventListener("command", DownloadScheduler.showScheduleWindow, false);
+
+      toolsOpenDownloadsParent.insertBefore(toolsOpenDownloadScheduler, toolsOpenDownloads.nextSibling);
+
+    }
+
+  },
+
+  removeToolsMenuEntry: function(win) {
+
+    var toolsOpenDownloads = win.document.getElementById("menu_openDownloads");
+
+    if(toolsOpenDownloads) {
+
+      var toolsOpenDownloadsParent = toolsOpenDownloads.parentElement;
+
+      var toolsOpenDownloadScheduler = win.document.getElementById("DownloadScheduler.menu_openDownloadScheduler");
+
+      if(toolsOpenDownloadScheduler)
+        toolsOpenDownloadsParent.removeChild(toolsOpenDownloadScheduler);
+
+    }
 
   },
 
   removeContextMenuEntry: function(win) {
 
-    var contextMenu    = win.document.getElementById("contentAreaContextMenu");
+    var contextMenu = win.document.getElementById("contentAreaContextMenu");
 
     if(contextMenu) {
 
       var scheduleLinkAsElement = win.document.getElementById("DownloadScheduler.context-schedulelink");
 
-      if(scheduleLinkAsElement != null)
+      if(scheduleLinkAsElement)
         contextMenu.removeChild(scheduleLinkAsElement);
 
       contextMenu.removeEventListener("popupshowing", DownloadScheduler.contextMenuPopupShowing, false);
@@ -675,6 +709,7 @@ var DownloadScheduler = {
 
   initGuiBrowserWindow: function(aWindow) {
     DownloadScheduler.addContextMenuEntry( aWindow );
+    DownloadScheduler.addToolsMenuEntry( aWindow );
     DownloadScheduler.replaceInternalPersist( aWindow );
   },
 
@@ -694,6 +729,7 @@ var DownloadScheduler = {
 
   shutdownGuiBrowserWindow: function(aWindow) {
     DownloadScheduler.removeContextMenuEntry( aWindow );
+    DownloadScheduler.removeToolsMenuEntry( aWindow );
     DownloadScheduler.restoreInternalPersist( aWindow );
   },
 
