@@ -1,15 +1,12 @@
-content     dlScheduler    chrome/content/
-style chrome://global/content/customizeToolbar.xul chrome://dlScheduler/content/button.css
+content     DownloadScheduler    chrome/content/
 
-locale	dlScheduler	de	chrome/locale/de/
-locale	dlScheduler	el	chrome/locale/el/
-locale	dlScheduler	en-US	chrome/locale/en-US/
-locale	dlScheduler	es-ES	chrome/locale/es-ES/
-locale	dlScheduler	fr	chrome/locale/fr/
-locale	dlScheduler	it	chrome/locale/it/
-locale	dlScheduler	nl	chrome/locale/nl/
-locale	dlScheduler	sv-SE	chrome/locale/sv-SE/
+locale	DownloadScheduler	de	chrome/locale/de/
+locale	DownloadScheduler	el	chrome/locale/el/
+locale	DownloadScheduler	en-US	chrome/locale/en-US/
+locale	DownloadScheduler	es-ES	chrome/locale/es-ES/
+locale	DownloadScheduler	fr	chrome/locale/fr/
+locale	DownloadScheduler	it	chrome/locale/it/
+locale	DownloadScheduler	nl	chrome/locale/nl/
+locale	DownloadScheduler	sv-SE	chrome/locale/sv-SE/
 
-overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/button.xul
-overlay chrome://browser/content/browser.xul chrome://dlScheduler/content/dlScheduler.xul
 
