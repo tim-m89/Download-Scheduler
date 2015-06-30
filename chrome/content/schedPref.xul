@@ -9,9 +9,9 @@
     onunload="DownloadScheduler_schedPref.prefUnload();">
     <prefpane label="General">
         <preferences>
-            <preference id="extensions.DownloadScheduler.prefWin.stopEnabledPref" name="extensions.DownloadScheduler.stopEnabled" type="bool" instantApply="false"/>
-            <preference id="extensions.DownloadScheduler.prefWin.stopTimePref" name="extensions.DownloadScheduler.stopTime" type="string" instantApply="false"/>
-            <preference id="extensions.DownloadScheduler.prefWin.httpPreConnectForFileNamePref" name="extensions.DownloadScheduler.httpPreConnectForFileName" type="bool" instantApply="false"/>
+            <preference id="extensions.DownloadScheduler.prefWin.stopEnabledPref" name="extensions.DownloadScheduler.stopEnabled" type="bool"/>
+            <preference id="extensions.DownloadScheduler.prefWin.stopTimePref" name="extensions.DownloadScheduler.stopTime" type="string"/>
+            <preference id="extensions.DownloadScheduler.prefWin.httpPreConnectForFileNamePref" name="extensions.DownloadScheduler.httpPreConnectForFileName" type="bool"/>
         </preferences>
         <vbox>
           <hbox>
