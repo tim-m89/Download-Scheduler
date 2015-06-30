@@ -20,17 +20,6 @@ var DownloadSchedulerState = {
   prefBranch              : null
 };
 
-var PreferenceObserver = {
-
-  observe: function(subject, topic, data) {
-
-    if (topic == "nsPref:changed") {
-    }
-
-  }
-
-};
-
 var DownloadScheduler = {
 
   ScheduleItem: ScheduleDownloadItem,
@@ -61,8 +50,6 @@ var DownloadScheduler = {
 
     DownloadSchedulerState.prefBranch = prefService.getBranch(PrefBranchName);
 
-    DownloadSchedulerState.prefBranch.addObserver("", PreferenceObserver, false);
-
   },
 
 
@@ -85,7 +72,6 @@ var DownloadScheduler = {
 
   shutdownPrefs: function() {
 
-    DownloadSchedulerState.prefBranch.removeObserver("", PreferenceObserver);
     DownloadSchedulerState.prefBranch = null;
 
   },
@@ -790,6 +776,7 @@ var DownloadScheduler = {
 
 
 }; // DownloadScheduler
+
 
 
 
