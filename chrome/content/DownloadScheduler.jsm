@@ -160,7 +160,7 @@ var DownloadScheduler = {
 
     var stopTimeString = DownloadSchedulerState.prefBranch.getCharPref("stopTime");
 
-    var stopDate = DownloadSchedulerInternal.timeStringToDate(stopTimeString);
+    var stopDate = DownloadScheduler.timeStringToDate(stopTimeString);
 
     var now = new Date();
 
