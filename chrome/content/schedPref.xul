@@ -5,7 +5,8 @@
     id="DownloadScheduler.schedPrefWindow"
     title="&DownloadSchedulerOptions;"
     xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    onload="DownloadScheduler_schedPref.prefLoad();">
+    onload="DownloadScheduler_schedPref.prefLoad();"
+    onunload="DownloadScheduler_schedPref.prefUnload();">
     <prefpane label="General">
         <preferences>
             <preference id="extensions.DownloadScheduler.prefWin.stopEnabledPref" name="extensions.DownloadScheduler.stopEnabled" type="bool" instantApply="false"/>
