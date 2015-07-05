@@ -38,8 +38,13 @@ DownloadScheduler_editWin = {
       scheduleTime = DownloadScheduler.getDefaultScheduleItemTime();
 
       if(scheduleTime != null) {
-        timePicker.dateValue = new Date(scheduleTime.getTime());
-        datePicker.dateValue = new Date(scheduleTime.getTime());
+        datePicker.date    = scheduleTime.getDate();
+        datePicker.month   = scheduleTime.getMonth();
+        datePicker.year    = scheduleTime.getFullYear();
+
+        timePicker.hour    = scheduleTime.getHours();
+        timePicker.minute  = scheduleTime.getMinutes();
+        timePicker.second  = scheduleTime.getSeconds();
       }
 
       if(window.arguments.length >= 2)
