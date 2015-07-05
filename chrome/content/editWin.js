@@ -16,42 +16,59 @@ DownloadScheduler_editWin = {
 
   },
 
+  datePickerSetDate: function(datePicker, dateTime) {
+    datePicker.date    = dateTime.getDate();
+    datePicker.month   = dateTime.getMonth();
+    datePicker.year    = dateTime.getFullYear();
+  },
+
+  timePickerSetTime: function(timePicker, dateTime) {
+    timePicker.hour    = dateTime.getHours();
+    timePicker.minute  = dateTime.getMinutes();
+    timePicker.second  = dateTime.getSeconds();
+  },
+
   loadDownload: function() {
 
     var urlBox      = document.getElementById("DownloadScheduler.editWin.source");
     var targetBox   = document.getElementById("DownloadScheduler.editWin.target");
+
     var timePicker  = document.getElementById("DownloadScheduler.editWin.timepick");
     var datePicker  = document.getElementById("DownloadScheduler.editWin.datepick");
 
     var scheduleItem = DownloadScheduler_editWin.getCurrentScheduleItem();
 
-    if(scheduleItem != null) {
+    var source       = null;
+    var target       = null;
+    var scheduleTime = null;
 
-      urlBox.value    = scheduleItem.source;
-      targetBox.value = scheduleItem.target;
+    if(scheduleItem) {
 
-      timePicker.dateValue = new Date(scheduleItem.startDateTime.getTime());
-      datePicker.dateValue = new Date(scheduleItem.startDateTime.getTime());
+      source       = scheduleItem.source;
+      target       = scheduleItem.target
+
+      scheduleTime = scheduleItem.startDateTime;
 
     } else {
 
+      if(window.arguments.length >= 2)
+        source    = window.arguments[1];
+      if(window.arguments.length >= 3)
+        target    = window.arguments[2];
+
       scheduleTime = DownloadScheduler.getDefaultScheduleItemTime();
 
-      if(scheduleTime != null) {
-        datePicker.date    = scheduleTime.getDate();
-        datePicker.month   = scheduleTime.getMonth();
-        datePicker.year    = scheduleTime.getFullYear();
+    }
 
-        timePicker.hour    = scheduleTime.getHours();
-        timePicker.minute  = scheduleTime.getMinutes();
-        timePicker.second  = scheduleTime.getSeconds();
-      }
+    if(source)
+      urlBox.value    = source;
 
-      if(window.arguments.length >= 2)
-        urlBox.value    = window.arguments[1];
-      if(window.arguments.length >= 3)
-        targetBox.value = window.arguments[2];
+    if(target)
+      targetBox.value = target;
 
+    if(scheduleTime) {
+      DownloadScheduler_editWin.datePickerSetDate( datePicker, scheduleTime );
+      DownloadScheduler_editWin.timePickerSetTime( timePicker, scheduleTime );
     }
 
 
