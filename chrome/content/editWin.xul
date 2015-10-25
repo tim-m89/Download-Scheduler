@@ -27,7 +27,7 @@
             <textbox id="DownloadScheduler.editWin.target" value="" tooltiptext="&TargetFileToolTip;" ondblclick="DownloadScheduler_editWin.chooseFile();"/>
           </row>
           <row align="baseline">
-            <label value="DateTime"/>
+            <label value="&DateTime;"/>
             <hbox align="center">
               <datepicker id="DownloadScheduler.editWin.datepick" type="popup"/>
               <timepicker id="DownloadScheduler.editWin.timepick" hideseconds="true"/>
