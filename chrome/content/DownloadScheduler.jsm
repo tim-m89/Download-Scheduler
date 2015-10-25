@@ -301,7 +301,7 @@ var DownloadScheduler = {
     if(scheduleWindow)
       scheduleWindow.focus();
     else
-      aEvent.target.ownerDocument.defaultView.open( "chrome://DownloadScheduler/content/schedWin.xul", "", "chrome, width=360, height=320, resizable=yes, centerscreen" ).focus();
+      aEvent.target.ownerDocument.defaultView.open( "chrome://DownloadScheduler/content/schedWin.xul", "", "chrome, width=430, height=320, resizable=yes, centerscreen" ).focus();
 
   },
 

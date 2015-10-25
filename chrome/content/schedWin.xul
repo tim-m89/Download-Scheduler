@@ -6,8 +6,7 @@
     title="&DownloadScheduler;"
     onload="DownloadScheduler_schedWin.refreshList();"
     windowtype="DownloadScheduler.schedWindow"
-    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul"
-    width="360">
+    xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
     <script src="schedWin.js"></script>
     <vbox flex="1" pack="end">
         <listbox minheight="40" minwidth="40" flex="1" id="DownloadScheduler.schedWin.listBoxItems" ondblclick="DownloadScheduler_schedWin.editItem();" />
