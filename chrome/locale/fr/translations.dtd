@@ -1,24 +1,23 @@
-<!ENTITY DownloadScheduler "Télécharger ordonnanceur">
-<!ENTITY ScheduleLinkAs "Horaire du lien sous… ">
-<!ENTITY DownloadSchedulerOptions "Télécharger le Planificateur Options">
+<!ENTITY DownloadScheduler "Télécharger Ordonnanceur">
+<!ENTITY ScheduleLinkAs "Annexe lien sous… ">
+<!ENTITY DownloadSchedulerOptions "Options de Télécharger Ordonnanceur">
 <!ENTITY Addnew "Ajouter un nouveau">
-<!ENTITY Editselected "Modifier la sélection">
-<!ENTITY Cancelselected "Annuler la sélection">
-<!ENTITY StartTime "Heure de début:">
-<!ENTITY StopAllDownloadsAtTime "Arr�tez tous les t�l�chargements au moment:">
-<!ENTITY PreConnectToServerForFileName "Pr� connecter au serveur pour am�liorer fichier cible inf�rence nom par d�faut">
-<!ENTITY PreConnectToolTip "Il s'agit d'une fonctionnalit� avanc�e pour aider le nom du fichier cible inf�rence. Il agit en bri�vement la connexion au serveur de chaque URL sur la planification afin de suivre les redirections HTTP et d'obtenir les en-t�tes �disposition� du contenu de sorte que le nom du fichier cible par d�faut peut �tre d�duite avec plus de pr�cision. Cette fonctionnalit� a �t� activ�e auparavant uniquement mais est maintenant un r�glage personnalis� qui est d�sactiv�e par d�faut car il n'est pas souhaitable pour tout le monde.">
-<!ENTITY ConfirmClose "Confirmer le fermer">
-<!ENTITY CloseMsg1 "Vous avez planifié téléchargements. Etes-vous sûr de vouloir quitter la session actuelle de Firefox?">
-<!ENTITY CloseMsg2 "Si vous choisissez 'OK' tous les téléchargements prévue sera annulée.">
+<!ENTITY Editselected "Modifier sélectionné">
+<!ENTITY Cancelselected "Annuler sélectionnée">
+<!ENTITY StartTime "Heure de départ:">
+<!ENTITY StopAllDownloadsAtTime "Arrêtez tous les téléchargements au moment:">
+<!ENTITY PreConnectToServerForFileName "Pré connecter au serveur pour améliorer fichier cible inférence nom par défaut">
+<!ENTITY PreConnectToolTip "Ceci est une fonctionnalité avancée pour aider le nom du fichier cible inférence. Il fonctionne en brièvement la connexion au serveur de chaque URL sur la planification afin de suivre les redirections HTTP et d'obtenir des têtes 'disposition de contenu' de sorte que le nom du fichier cible par défaut peut être déduite avec plus de précision . Cette fonctionnalité a été activée auparavant seulement , mais est maintenant un réglage personnalisé qui est désactivé par défaut car il est pas souhaitable pour tout le monde.">
+<!ENTITY ConfirmClose "Confirmer Fermer">
+<!ENTITY CloseMsg1 "Vous avez prévu de téléchargements . Êtes-vous sûr de vouloir quitter la session en cours firefox?">
+<!ENTITY CloseMsg2 "If you choose 'OK' all scheduled downloads will be aborted.">
 <!ENTITY Enabled "Activé">
-<!ENTITY AddEdit "Ajouter / Modifier">
-<!ENTITY TargetFileToolTip "Fichier de destination. Double-cliquez pour ouvrir sélecteur de fichier.">
-<!ENTITY EnterSourceURL "Entrez l'URL de la source">
-<!ENTITY ChooseTargetFile "Choisissez le fichier cible">
-<!ENTITY Recurring "Récurrents">
-<!ENTITY RecurringToolTip "Lorsqu'elle est sélectionnée, élément reste dans la liste de programmation lors du démarrage de téléchargement pour la prochaine fois.">
+<!ENTITY AddEdit "Ajouter / Editer">
+<!ENTITY TargetFileToolTip "Destination File. Double Click to open file chooser.">
+<!ENTITY EnterSourceURL "Source URL">
+<!ENTITY ChooseTargetFile "Fichier cible">
+<!ENTITY Recurring "Récurrent">
+<!ENTITY RecurringToolTip "Lorsqu'il est sélectionné , élément reste dans la liste de calendrier lors du démarrage de téléchargement pour la prochaine fois.">
 <!ENTITY DateTime "Date / Heure">
 <!ENTITY Save "Enregistrer">
 <!ENTITY Cancel "Annuler">
-
