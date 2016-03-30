@@ -128,7 +128,7 @@ var DownloadScheduler = {
 
       var scheduleItem = items[i];
 
-      if(scheduleItem.tiimer) {
+      if(scheduleItem.timer) {
         scheduleItem.timer.cancel();
         scheduleItem.timer = null;
       }
@@ -482,7 +482,7 @@ var DownloadScheduler = {
 
   cancelItem: function(scheduleItem) {
 
-    if(scheduleItem.tiimer) {
+    if(scheduleItem.timer) {
       scheduleItem.timer.cancel();
       scheduleItem.timer = null;
     }
