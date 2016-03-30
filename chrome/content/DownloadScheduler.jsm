@@ -481,8 +481,16 @@ var DownloadScheduler = {
   },
 
   cancelItem: function(scheduleItem) {
+
+    if(scheduleItem.tiimer) {
+      scheduleItem.timer.cancel();
+      scheduleItem.timer = null;
+    }
+
     DownloadScheduler.removeItem(scheduleItem);
+
     DownloadScheduler.removeEmptyFile( scheduleItem.target );
+
   },
 
   loadScheduleItems: function() {
